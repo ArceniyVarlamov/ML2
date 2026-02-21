@@ -1,0 +1,139 @@
+{
+  "seed": 42,
+  "output_dir": "artifacts_fast_h1_quantize_lite_v2",
+  "data": {
+    "train_main": "Data/Train/train_main_features.parquet",
+    "train_extra": "Data/Train/train_extra_features.parquet",
+    "test_main": "Data/Test/test_main_features.parquet",
+    "test_extra": "Data/Test/test_extra_features.parquet",
+    "train_target": "Data/Main/train_target.parquet",
+    "sample_submit": "Data/Main/sample_submit.parquet"
+  },
+  "folds": {
+    "n_splits": 3,
+    "method": "multilabel"
+  },
+  "features": {
+    "extra_selection": "variance",
+    "extra_top_k": 600,
+    "variance_sample_rows": 100000,
+    "add_row_stats": true,
+    "add_svd": false,
+    "svd_components": 48,
+    "svd_fit_rows": 120000,
+    "svd_batch_size": 100000,
+    "per_target_top_k": 0,
+    "per_target_sample_rows": 120000,
+    "reuse_per_target_feature_map": true,
+    "per_target_always_keep_prefixes": [
+      "row_extra_",
+      "svd_extra_"
+    ],
+    "quantize_num_decimals": [
+      0
+    ],
+    "quantize_num_prefixes": [
+      "num_feature"
+    ],
+    "quantize_max_cols": 220,
+    "oof_global_target_encoding": false,
+    "oof_te_alpha": 20.0,
+    "oof_te_max_cat_cols": 0
+  },
+  "models": {
+    "catboost": {
+      "enabled": true,
+      "params": {
+        "iterations": 650,
+        "learning_rate": 0.06,
+        "depth": 8,
+        "l2_leaf_reg": 6.0,
+        "loss_function": "Logloss",
+        "eval_metric": "AUC",
+        "random_seed": 42,
+        "task_type": "CPU",
+        "early_stopping_rounds": 50,
+        "verbose": false,
+        "auto_scale_pos_weight": true
+      }
+    },
+    "lightgbm": {
+      "enabled": true,
+      "params": {
+        "n_estimators": 1200,
+        "learning_rate": 0.06,
+        "num_leaves": 127,
+        "max_depth": -1,
+        "subsample": 0.85,
+        "subsample_freq": 1,
+        "colsample_bytree": 0.85,
+        "reg_alpha": 0.1,
+        "reg_lambda": 2.0,
+        "objective": "binary",
+        "n_jobs": -1,
+        "random_state": 42,
+        "early_stopping_rounds": 50
+      }
+    },
+    "xgboost": {
+      "enabled": false,
+      "params": {
+        "n_estimators": 1400,
+        "learning_rate": 0.05,
+        "max_depth": 7,
+        "min_child_weight": 3.0,
+        "subsample": 0.85,
+        "colsample_bytree": 0.85,
+        "reg_alpha": 0.05,
+        "reg_lambda": 1.5,
+        "objective": "binary:logistic",
+        "tree_method": "hist",
+        "eval_metric": "auc",
+        "n_jobs": -1,
+        "random_state": 42,
+        "early_stopping_rounds": 60
+      }
+    },
+    "mlp": {
+      "enabled": false,
+      "params": {
+        "hidden_layer_sizes": [
+          256,
+          128
+        ],
+        "activation": "relu",
+        "solver": "adam",
+        "alpha": 0.0002,
+        "batch_size": 1024,
+        "learning_rate_init": 0.001,
+        "max_iter": 40,
+        "early_stopping": true,
+        "validation_fraction": 0.1,
+        "n_iter_no_change": 6,
+        "random_state": 42,
+        "max_train_rows": 200000
+      }
+    }
+  },
+  "blend": {
+    "use_rank": true,
+    "weight_step": 0.05
+  },
+  "stack": {
+    "C": 0.5,
+    "max_iter": 900,
+    "class_weight": "balanced",
+    "cross_target_top_k": 0,
+    "cross_target_models": [
+      "catboost",
+      "lightgbm"
+    ]
+  },
+  "advval": {
+    "model": "lightgbm",
+    "n_splits": 3,
+    "sample_rows_per_class": 120000,
+    "shift_threshold": 0.55,
+    "early_stopping_rounds": 80
+  }
+}

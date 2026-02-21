@@ -1,0 +1,10 @@
+numpy>=1.26
+pandas>=2.2
+polars>=1.8
+pyarrow>=17.0
+scikit-learn>=1.5
+scipy>=1.11
+catboost>=1.2
+lightgbm>=4.5
+xgboost>=2.1
+iterative-stratification>=0.1.9

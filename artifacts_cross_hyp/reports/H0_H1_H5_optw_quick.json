@@ -1,0 +1,1425 @@
+{
+  "mode": "optimize_weights",
+  "sources": [
+    {
+      "label": "H0_blend",
+      "oof_path": "artifacts_fast_base/ensemble/blend_oof.parquet",
+      "test_path": "artifacts_fast_base/ensemble/blend_test.parquet"
+    },
+    {
+      "label": "H1_blend",
+      "oof_path": "artifacts_fast_h1_quantize_lite_v2/ensemble/blend_oof.parquet",
+      "test_path": "artifacts_fast_h1_quantize_lite_v2/ensemble/blend_test.parquet"
+    },
+    {
+      "label": "H5_stack",
+      "oof_path": "artifacts_fast_h5_crossstack/ensemble/stack_oof.parquet",
+      "test_path": "artifacts_fast_h5_crossstack/ensemble/stack_test.parquet"
+    }
+  ],
+  "opt_params": {
+    "alpha": 0.1,
+    "min_weight": 0.01,
+    "max_weight": 0.99,
+    "maxiter": 80,
+    "max_rows": 30000,
+    "seed": 42
+  },
+  "targets": {
+    "target_1_1": {
+      "final_auc": 0.9141201170236974,
+      "per_source_auc": {
+        "H0_blend": 0.9132011264052999,
+        "H1_blend": 0.9124833018819754,
+        "H5_stack": 0.9108814950368964
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.9138533267347941,
+          "reg": 0.0,
+          "loss": -0.9138533267347941,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_1_2": {
+      "final_auc": 0.8227393945083898,
+      "per_source_auc": {
+        "H0_blend": 0.8207871779974817,
+        "H1_blend": 0.8200717407509069,
+        "H5_stack": 0.8145904430970934
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.7990307174373115,
+          "reg": 0.0,
+          "loss": -0.7990307174373115,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_1_3": {
+      "final_auc": 0.8707293709995375,
+      "per_source_auc": {
+        "H1_blend": 0.8699227991210562,
+        "H0_blend": 0.8698479847884781,
+        "H5_stack": 0.8687185779802215
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H1_blend",
+            "weight": 0.3330370202018465
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.33392595959630705
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3330370202018465
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 2,
+          "auc": 0.8678304142800328,
+          "reg": 5.2680883134926286e-08,
+          "loss": -0.8678303615991497,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_1_4": {
+      "final_auc": 0.8349826172919899,
+      "per_source_auc": {
+        "H0_blend": 0.8339844764915255,
+        "H1_blend": 0.833148017443303,
+        "H5_stack": 0.8330437821623208
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.33302911619569797
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.33348544190565604
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.33348544189864593
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 2,
+          "auc": 0.8309685702287425,
+          "reg": 1.3882210024656195e-08,
+          "loss": -0.8309685563465324,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_1_5": {
+      "final_auc": 0.8817103515151711,
+      "per_source_auc": {
+        "H0_blend": 0.8777586801007353,
+        "H1_blend": 0.8772225732767402,
+        "H5_stack": 0.8717576723536982
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.8769981329406944,
+          "reg": 0.0,
+          "loss": -0.8769981329406944,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_2_1": {
+      "final_auc": 0.8272182671457508,
+      "per_source_auc": {
+        "H0_blend": 0.8252336846234786,
+        "H1_blend": 0.8250145997711135,
+        "H5_stack": 0.8245939649379522
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.8229176763786579,
+          "reg": 0.0,
+          "loss": -0.8229176763786579,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_2_2": {
+      "final_auc": 0.937709036823851,
+      "per_source_auc": {
+        "H0_blend": 0.9372965928327563,
+        "H1_blend": 0.9369153109710877,
+        "H5_stack": 0.9365304027315329
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3339264289972231
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.33303678550138843
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.33303678550138843
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 2,
+          "auc": 0.9405727554179567,
+          "reg": 5.276436997872607e-08,
+          "loss": -0.9405727026535867,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_2_3": {
+      "final_auc": 0.8058465002128686,
+      "per_source_auc": {
+        "H0_blend": 0.8028213573504385,
+        "H1_blend": 0.7980262316551345,
+        "H5_stack": 0.7872480637450749
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.7863040002034594,
+          "reg": 0.0,
+          "loss": -0.7863040002034594,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_2_4": {
+      "final_auc": 0.7467220376965379,
+      "per_source_auc": {
+        "H5_stack": 0.7422835730618125,
+        "H0_blend": 0.7420457946102437,
+        "H1_blend": 0.7398281038185214
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.7230469731985237,
+          "reg": 0.0,
+          "loss": -0.7230469731985237,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_2_5": {
+      "final_auc": 0.7729689623462321,
+      "per_source_auc": {
+        "H0_blend": 0.7617885805631762,
+        "H5_stack": 0.7617048845722059,
+        "H1_blend": 0.7566276632412394
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.7877581439823383,
+          "reg": 0.0,
+          "loss": -0.7877581439823383,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_2_6": {
+      "final_auc": 0.749073111578254,
+      "per_source_auc": {
+        "H0_blend": 0.7412724589413324,
+        "H5_stack": 0.7408615970736765,
+        "H1_blend": 0.7399646873541448
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.33301635404343394
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3339672919131322
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.33301635404343394
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 2,
+          "auc": 0.7400481309681792,
+          "reg": 6.028552213508217e-08,
+          "loss": -0.7400480706826571,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_2_7": {
+      "final_auc": 0.871130460978113,
+      "per_source_auc": {
+        "H5_stack": 0.8627059434629116,
+        "H0_blend": 0.8624279797437193,
+        "H1_blend": 0.8571303880867414
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.8901559356695897,
+          "reg": 0.0,
+          "loss": -0.8901559356695897,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_2_8": {
+      "final_auc": 0.9847899151441836,
+      "per_source_auc": {
+        "H0_blend": 0.990121637718269,
+        "H1_blend": 0.9894061368494258,
+        "H5_stack": 0.8876537758532024
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.9727417186163061,
+          "reg": 0.0,
+          "loss": -0.9727417186163061,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_3_1": {
+      "final_auc": 0.695224853058972,
+      "per_source_auc": {
+        "H5_stack": 0.6944899142021587,
+        "H0_blend": 0.6943083205861416,
+        "H1_blend": 0.6936461450688938
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.3331117244081499
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3338319164773057
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3330563591145445
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 2,
+          "auc": 0.6933727047988603,
+          "reg": 3.744103850480067e-08,
+          "loss": -0.6933726673578218,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_3_2": {
+      "final_auc": 0.9099017283455866,
+      "per_source_auc": {
+        "H0_blend": 0.9096090966459728,
+        "H1_blend": 0.9095840751744916,
+        "H5_stack": 0.9088077531796184
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.33305047293274037
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.33305047293274037
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3338990541345192
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 2,
+          "auc": 0.9116644369431095,
+          "reg": 4.800600373416032e-08,
+          "loss": -0.9116643889371058,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_3_3": {
+      "final_auc": 0.7726814314034678,
+      "per_source_auc": {
+        "H0_blend": 0.768318747985437,
+        "H1_blend": 0.7632694302857368,
+        "H5_stack": 0.7584832660599943
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.7398489298269034,
+          "reg": 0.0,
+          "loss": -0.7398489298269034,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_3_4": {
+      "final_auc": 0.9488582391334259,
+      "per_source_auc": {
+        "H5_stack": 0.9481409970915322,
+        "H0_blend": 0.9480313039176334,
+        "H1_blend": 0.944185610877095
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.9684203792883066,
+          "reg": 0.0,
+          "loss": -0.9684203792883066,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_3_5": {
+      "final_auc": 0.9750950620158431,
+      "per_source_auc": {
+        "H1_blend": 0.9739486444349997,
+        "H0_blend": 0.9732620199578925,
+        "H5_stack": 0.9725180712102945
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.9818282173440847,
+          "reg": 0.0,
+          "loss": -0.9818282173440847,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_4_1": {
+      "final_auc": 0.8516163202192522,
+      "per_source_auc": {
+        "H5_stack": 0.8502336206056145,
+        "H0_blend": 0.8488861687706862,
+        "H1_blend": 0.8487236558056396
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.8507110564834424,
+          "reg": 0.0,
+          "loss": -0.8507110564834424,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_5_1": {
+      "final_auc": 0.7496832754957914,
+      "per_source_auc": {
+        "H1_blend": 0.7472381278074813,
+        "H5_stack": 0.7463171341047276,
+        "H0_blend": 0.7457891773801371
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H1_blend",
+            "weight": 0.3330255974698861
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3330255974698861
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.33394880506022784
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 2,
+          "auc": 0.7306241588156123,
+          "reg": 5.682081699097555e-08,
+          "loss": -0.7306241019947953,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_5_2": {
+      "final_auc": 0.7304122711437453,
+      "per_source_auc": {
+        "H5_stack": 0.7278442200721996,
+        "H1_blend": 0.7227077407263485,
+        "H0_blend": 0.7196659567729302
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.7518743997038285,
+          "reg": 0.0,
+          "loss": -0.7518743997038285,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_6_1": {
+      "final_auc": 0.7307804624237628,
+      "per_source_auc": {
+        "H0_blend": 0.7275079359710013,
+        "H5_stack": 0.7271446415742456,
+        "H1_blend": 0.7270110347399987
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.7335081268183418,
+          "reg": 0.0,
+          "loss": -0.7335081268183418,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_6_2": {
+      "final_auc": 0.7327975760609693,
+      "per_source_auc": {
+        "H5_stack": 0.7318880880697117,
+        "H0_blend": 0.7269816010806347,
+        "H1_blend": 0.7269798051012369
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.7318217875340584,
+          "reg": 0.0,
+          "loss": -0.7318217875340584,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_6_3": {
+      "final_auc": 0.7630788882614302,
+      "per_source_auc": {
+        "H5_stack": 0.763769102042091,
+        "H0_blend": 0.7541532811401042,
+        "H1_blend": 0.7536461764566778
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.7729937083359346,
+          "reg": 0.0,
+          "loss": -0.7729937083359346,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_6_4": {
+      "final_auc": 0.852817253888689,
+      "per_source_auc": {
+        "H5_stack": 0.8518365726358177,
+        "H1_blend": 0.8509283977491101,
+        "H0_blend": 0.8499343427348118
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.8494615267220781,
+          "reg": 0.0,
+          "loss": -0.8494615267220781,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_6_5": {
+      "final_auc": 0.9333251392037033,
+      "per_source_auc": {
+        "H5_stack": 0.9287165820584337,
+        "H0_blend": 0.9273971528131902,
+        "H1_blend": 0.9263919627665083
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.9171059678916091,
+          "reg": 0.0,
+          "loss": -0.9171059678916091,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_7_1": {
+      "final_auc": 0.8117622677352297,
+      "per_source_auc": {
+        "H0_blend": 0.8114005657372444,
+        "H1_blend": 0.8110119830110816,
+        "H5_stack": 0.8099013415518816
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.8150752142222222,
+          "reg": 0.0,
+          "loss": -0.8150752142222222,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_7_2": {
+      "final_auc": 0.865193389133301,
+      "per_source_auc": {
+        "H5_stack": 0.8634983384001518,
+        "H0_blend": 0.862339279307747,
+        "H1_blend": 0.8623132792125083
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.8686242673814903,
+          "reg": 0.0,
+          "loss": -0.8686242673814903,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_7_3": {
+      "final_auc": 0.7931766705900338,
+      "per_source_auc": {
+        "H1_blend": 0.7863361853074692,
+        "H0_blend": 0.7861265819033115,
+        "H5_stack": 0.7810012795258159
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.7942407635894844,
+          "reg": 0.0,
+          "loss": -0.7942407635894844,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_8_1": {
+      "final_auc": 0.981880002262298,
+      "per_source_auc": {
+        "H0_blend": 0.9819401906731664,
+        "H1_blend": 0.981785035619988,
+        "H5_stack": 0.9804368132143966
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.9824985574201146,
+          "reg": 0.0,
+          "loss": -0.9824985574201146,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_8_2": {
+      "final_auc": 0.8554280086495883,
+      "per_source_auc": {
+        "H0_blend": 0.854444983753289,
+        "H1_blend": 0.8540629992539694,
+        "H5_stack": 0.8538842436547658
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.8550228923039385,
+          "reg": 0.0,
+          "loss": -0.8550228923039385,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_8_3": {
+      "final_auc": 0.8762644299051002,
+      "per_source_auc": {
+        "H0_blend": 0.8753339673967209,
+        "H1_blend": 0.8743067018261059,
+        "H5_stack": 0.8723989562194971
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.8701200152227369,
+          "reg": 0.0,
+          "loss": -0.8701200152227369,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_9_1": {
+      "final_auc": 0.7807016661356717,
+      "per_source_auc": {
+        "H5_stack": 0.7770857538740795,
+        "H0_blend": 0.777061152350091,
+        "H1_blend": 0.7748247039676504
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.773352354533398,
+          "reg": 0.0,
+          "loss": -0.773352354533398,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_9_2": {
+      "final_auc": 0.8393936296538375,
+      "per_source_auc": {
+        "H0_blend": 0.8388791635216126,
+        "H1_blend": 0.8386184343042891,
+        "H5_stack": 0.8379889637388327
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.8505131973371652,
+          "reg": 0.0,
+          "loss": -0.8505131973371652,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_9_3": {
+      "final_auc": 0.686106954637367,
+      "per_source_auc": {
+        "H5_stack": 0.6841698905249544,
+        "H0_blend": 0.6834676806455791,
+        "H1_blend": 0.6832961748643945
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.6898635238742236,
+          "reg": 0.0,
+          "loss": -0.6898635238742236,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_9_4": {
+      "final_auc": 0.9116057605362652,
+      "per_source_auc": {
+        "H0_blend": 0.9091437269172757,
+        "H1_blend": 0.9087826966215949,
+        "H5_stack": 0.906609023108496
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.9048033093866532,
+          "reg": 0.0,
+          "loss": -0.9048033093866532,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_9_5": {
+      "final_auc": 0.8431120326914722,
+      "per_source_auc": {
+        "H0_blend": 0.8413172943492356,
+        "H1_blend": 0.8403294872383318,
+        "H5_stack": 0.8381745934935928
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.8623401963928614,
+          "reg": 0.0,
+          "loss": -0.8623401963928614,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_9_6": {
+      "final_auc": 0.6927415913948374,
+      "per_source_auc": {
+        "H5_stack": 0.6927829459203978,
+        "H0_blend": 0.6921373884089228,
+        "H1_blend": 0.6914747976040786
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.3334502004295992
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.3334502004295992
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.33309959914080156
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 2,
+          "auc": 0.6969981805538473,
+          "reg": 8.194750913771938e-09,
+          "loss": -0.6969981723590964,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_9_7": {
+      "final_auc": 0.7668839741451983,
+      "per_source_auc": {
+        "H0_blend": 0.7662775453546227,
+        "H1_blend": 0.765851802014339,
+        "H5_stack": 0.7652181405622125
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3338655282999492
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.33306723585002546
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.33306723585002546
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 2,
+          "auc": 0.7753726911734274,
+          "reg": 4.248472237368347e-08,
+          "loss": -0.775372648688705,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_9_8": {
+      "final_auc": 0.9344710014850359,
+      "per_source_auc": {
+        "H0_blend": 0.934482824347013,
+        "H1_blend": 0.934067920005863,
+        "H5_stack": 0.9313576264220385
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3333333333333333
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.3333333333333333
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 1,
+          "auc": 0.9329354368275352,
+          "reg": 0.0,
+          "loss": -0.9329354368275352,
+          "fit_rows": 30000
+        }
+      }
+    },
+    "target_10_1": {
+      "final_auc": 0.7563087269168637,
+      "per_source_auc": {
+        "H5_stack": 0.7567140637712179,
+        "H0_blend": 0.7552794444788808,
+        "H1_blend": 0.7550416735573325
+      },
+      "chosen": {
+        "strategy": "optimize_weights",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.33318244220712484
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.33306798434749185
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.3337495734453834
+          }
+        ],
+        "optimizer": {
+          "success": true,
+          "message": "Optimization terminated successfully",
+          "n_iter": 2,
+          "auc": 0.7574138876213666,
+          "reg": 2.6643404713503728e-08,
+          "loss": -0.7574138609779619,
+          "fit_rows": 30000
+        }
+      }
+    }
+  },
+  "macro_auc": 0.8307571402388126
+}

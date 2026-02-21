@@ -1,0 +1,13 @@
+{
+  "model": "lightgbm",
+  "n_splits": 3,
+  "sample_rows_per_class": 150000,
+  "fold_aucs": [
+    0.5011916897999998,
+    0.5033917682,
+    0.5003558864000001
+  ],
+  "mean_auc": 0.5016464481333333,
+  "shift_threshold": 0.55,
+  "shift_detected": false
+}

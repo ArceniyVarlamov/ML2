@@ -1,0 +1,930 @@
+{
+  "mode": "top2_weighted",
+  "sources": [
+    {
+      "label": "H0_blend",
+      "oof_path": "artifacts_fast_base/ensemble/blend_oof.parquet",
+      "test_path": "artifacts_fast_base/ensemble/blend_test.parquet"
+    },
+    {
+      "label": "H1_blend",
+      "oof_path": "artifacts_fast_h1_quantize_lite_v2/ensemble/blend_oof.parquet",
+      "test_path": "artifacts_fast_h1_quantize_lite_v2/ensemble/blend_test.parquet"
+    },
+    {
+      "label": "H5_stack",
+      "oof_path": "artifacts_fast_h5_crossstack/ensemble/stack_oof.parquet",
+      "test_path": "artifacts_fast_h5_crossstack/ensemble/stack_test.parquet"
+    },
+    {
+      "label": "H3_blend",
+      "oof_path": "artifacts_fast_h3_quantize_te/ensemble/blend_oof.parquet",
+      "test_path": "artifacts_fast_h3_quantize_te/ensemble/blend_test.parquet"
+    }
+  ],
+  "targets": {
+    "target_1_1": {
+      "final_auc": 0.9139989970593855,
+      "per_source_auc": {
+        "H3_blend": 0.9133193143449548,
+        "H0_blend": 0.9132011264052999,
+        "H1_blend": 0.9124833018819754,
+        "H5_stack": 0.9108814950368964
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_1_2": {
+      "final_auc": 0.8241376486373992,
+      "per_source_auc": {
+        "H3_blend": 0.8228292963277859,
+        "H0_blend": 0.8207871779974817,
+        "H1_blend": 0.8200717407509069,
+        "H5_stack": 0.8145904430970934
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_1_3": {
+      "final_auc": 0.870815887634009,
+      "per_source_auc": {
+        "H3_blend": 0.8702415788162727,
+        "H1_blend": 0.8699227991210562,
+        "H0_blend": 0.8698479847884781,
+        "H5_stack": 0.8687185779802215
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_1_4": {
+      "final_auc": 0.8352109557664156,
+      "per_source_auc": {
+        "H3_blend": 0.8343451119168082,
+        "H0_blend": 0.8339844764915255,
+        "H1_blend": 0.833148017443303,
+        "H5_stack": 0.8330437821623208
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_1_5": {
+      "final_auc": 0.8816959566649536,
+      "per_source_auc": {
+        "H3_blend": 0.8793840795943959,
+        "H0_blend": 0.8777586801007353,
+        "H1_blend": 0.8772225732767402,
+        "H5_stack": 0.8717576723536982
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_1": {
+      "final_auc": 0.8272381689319591,
+      "per_source_auc": {
+        "H3_blend": 0.825912820131798,
+        "H0_blend": 0.8252336846234786,
+        "H1_blend": 0.8250145997711135,
+        "H5_stack": 0.8245939649379522
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_2": {
+      "final_auc": 0.9376008759113565,
+      "per_source_auc": {
+        "H0_blend": 0.9372965928327563,
+        "H3_blend": 0.9370874012770319,
+        "H1_blend": 0.9369153109710877,
+        "H5_stack": 0.9365304027315329
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H3_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_3": {
+      "final_auc": 0.806684774207875,
+      "per_source_auc": {
+        "H0_blend": 0.8028213573504385,
+        "H3_blend": 0.8014223158971678,
+        "H1_blend": 0.7980262316551345,
+        "H5_stack": 0.7872480637450749
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H3_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_4": {
+      "final_auc": 0.744742247471484,
+      "per_source_auc": {
+        "H5_stack": 0.7422835730618125,
+        "H0_blend": 0.7420457946102437,
+        "H3_blend": 0.7419051725649048,
+        "H1_blend": 0.7398281038185214
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_5": {
+      "final_auc": 0.7691882683445086,
+      "per_source_auc": {
+        "H3_blend": 0.7627126024471762,
+        "H0_blend": 0.7617885805631762,
+        "H5_stack": 0.7617048845722059,
+        "H1_blend": 0.7566276632412394
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_6": {
+      "final_auc": 0.7483760292797675,
+      "per_source_auc": {
+        "H3_blend": 0.7462101701842366,
+        "H0_blend": 0.7412724589413324,
+        "H5_stack": 0.7408615970736765,
+        "H1_blend": 0.7399646873541448
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_7": {
+      "final_auc": 0.8696489053653131,
+      "per_source_auc": {
+        "H5_stack": 0.8627059434629116,
+        "H0_blend": 0.8624279797437193,
+        "H3_blend": 0.8598949252605214,
+        "H1_blend": 0.8571303880867414
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_8": {
+      "final_auc": 0.9912131079052267,
+      "per_source_auc": {
+        "H0_blend": 0.990121637718269,
+        "H3_blend": 0.9897450900228943,
+        "H1_blend": 0.9894061368494258,
+        "H5_stack": 0.8876537758532024
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H3_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_3_1": {
+      "final_auc": 0.6956723701873166,
+      "per_source_auc": {
+        "H5_stack": 0.6944899142021587,
+        "H3_blend": 0.6944337536267391,
+        "H0_blend": 0.6943083205861416,
+        "H1_blend": 0.6936461450688938
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.65
+          },
+          {
+            "label": "H3_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_3_2": {
+      "final_auc": 0.909855437326724,
+      "per_source_auc": {
+        "H3_blend": 0.9097335578558603,
+        "H0_blend": 0.9096090966459728,
+        "H1_blend": 0.9095840751744916,
+        "H5_stack": 0.9088077531796184
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_3_3": {
+      "final_auc": 0.7738508190768401,
+      "per_source_auc": {
+        "H3_blend": 0.7690936210595374,
+        "H0_blend": 0.768318747985437,
+        "H1_blend": 0.7632694302857368,
+        "H5_stack": 0.7584832660599943
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_3_4": {
+      "final_auc": 0.9486448704519673,
+      "per_source_auc": {
+        "H5_stack": 0.9481409970915322,
+        "H0_blend": 0.9480313039176334,
+        "H3_blend": 0.9471306419091816,
+        "H1_blend": 0.944185610877095
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_3_5": {
+      "final_auc": 0.9748307626742783,
+      "per_source_auc": {
+        "H3_blend": 0.9741431540490909,
+        "H1_blend": 0.9739486444349997,
+        "H0_blend": 0.9732620199578925,
+        "H5_stack": 0.9725180712102945
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_4_1": {
+      "final_auc": 0.8520802652012806,
+      "per_source_auc": {
+        "H5_stack": 0.8502336206056145,
+        "H3_blend": 0.8495870490085612,
+        "H0_blend": 0.8488861687706862,
+        "H1_blend": 0.8487236558056396
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.65
+          },
+          {
+            "label": "H3_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_5_1": {
+      "final_auc": 0.7502164590469111,
+      "per_source_auc": {
+        "H3_blend": 0.7484968811320314,
+        "H1_blend": 0.7472381278074813,
+        "H5_stack": 0.7463171341047276,
+        "H0_blend": 0.7457891773801371
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_5_2": {
+      "final_auc": 0.734577084539182,
+      "per_source_auc": {
+        "H5_stack": 0.7278442200721996,
+        "H3_blend": 0.7272982450251855,
+        "H1_blend": 0.7227077407263485,
+        "H0_blend": 0.7196659567729302
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.65
+          },
+          {
+            "label": "H3_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_6_1": {
+      "final_auc": 0.7308892687440545,
+      "per_source_auc": {
+        "H3_blend": 0.7292110334367898,
+        "H0_blend": 0.7275079359710013,
+        "H5_stack": 0.7271446415742456,
+        "H1_blend": 0.7270110347399987
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_6_2": {
+      "final_auc": 0.7366262295959859,
+      "per_source_auc": {
+        "H5_stack": 0.7318880880697117,
+        "H3_blend": 0.7311155066291738,
+        "H0_blend": 0.7269816010806347,
+        "H1_blend": 0.7269798051012369
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.65
+          },
+          {
+            "label": "H3_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_6_3": {
+      "final_auc": 0.7672167657845586,
+      "per_source_auc": {
+        "H5_stack": 0.763769102042091,
+        "H3_blend": 0.7582855488494172,
+        "H0_blend": 0.7541532811401042,
+        "H1_blend": 0.7536461764566778
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.65
+          },
+          {
+            "label": "H3_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_6_4": {
+      "final_auc": 0.8538662858539438,
+      "per_source_auc": {
+        "H5_stack": 0.8518365726358177,
+        "H3_blend": 0.851679297913188,
+        "H1_blend": 0.8509283977491101,
+        "H0_blend": 0.8499343427348118
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.65
+          },
+          {
+            "label": "H3_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_6_5": {
+      "final_auc": 0.9352431064917067,
+      "per_source_auc": {
+        "H3_blend": 0.9311550342369632,
+        "H5_stack": 0.9287165820584337,
+        "H0_blend": 0.9273971528131902,
+        "H1_blend": 0.9263919627665083
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_7_1": {
+      "final_auc": 0.8122875503502225,
+      "per_source_auc": {
+        "H3_blend": 0.8117996914612148,
+        "H0_blend": 0.8114005657372444,
+        "H1_blend": 0.8110119830110816,
+        "H5_stack": 0.8099013415518816
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_7_2": {
+      "final_auc": 0.8656625628507574,
+      "per_source_auc": {
+        "H5_stack": 0.8634983384001518,
+        "H3_blend": 0.8626730552425431,
+        "H0_blend": 0.862339279307747,
+        "H1_blend": 0.8623132792125083
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.65
+          },
+          {
+            "label": "H3_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_7_3": {
+      "final_auc": 0.7926887514299903,
+      "per_source_auc": {
+        "H3_blend": 0.7881819842790684,
+        "H1_blend": 0.7863361853074692,
+        "H0_blend": 0.7861265819033115,
+        "H5_stack": 0.7810012795258159
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_8_1": {
+      "final_auc": 0.9820349321039863,
+      "per_source_auc": {
+        "H0_blend": 0.9819401906731664,
+        "H3_blend": 0.9819098956838668,
+        "H1_blend": 0.981785035619988,
+        "H5_stack": 0.9804368132143966
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H3_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_8_2": {
+      "final_auc": 0.8553643994313879,
+      "per_source_auc": {
+        "H3_blend": 0.8546441747574545,
+        "H0_blend": 0.854444983753289,
+        "H1_blend": 0.8540629992539694,
+        "H5_stack": 0.8538842436547658
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_8_3": {
+      "final_auc": 0.876227493305788,
+      "per_source_auc": {
+        "H3_blend": 0.8753970129790822,
+        "H0_blend": 0.8753339673967209,
+        "H1_blend": 0.8743067018261059,
+        "H5_stack": 0.8723989562194971
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_1": {
+      "final_auc": 0.7831034672933826,
+      "per_source_auc": {
+        "H3_blend": 0.7798976103765842,
+        "H5_stack": 0.7770857538740795,
+        "H0_blend": 0.777061152350091,
+        "H1_blend": 0.7748247039676504
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_2": {
+      "final_auc": 0.839777137998968,
+      "per_source_auc": {
+        "H3_blend": 0.839369078060022,
+        "H0_blend": 0.8388791635216126,
+        "H1_blend": 0.8386184343042891,
+        "H5_stack": 0.8379889637388327
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_3": {
+      "final_auc": 0.6862370583443401,
+      "per_source_auc": {
+        "H3_blend": 0.6842688921937409,
+        "H5_stack": 0.6841698905249544,
+        "H0_blend": 0.6834676806455791,
+        "H1_blend": 0.6832961748643945
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H5_stack",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_4": {
+      "final_auc": 0.910998539916579,
+      "per_source_auc": {
+        "H3_blend": 0.9095042586512451,
+        "H0_blend": 0.9091437269172757,
+        "H1_blend": 0.9087826966215949,
+        "H5_stack": 0.906609023108496
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_5": {
+      "final_auc": 0.843064576287198,
+      "per_source_auc": {
+        "H3_blend": 0.8417972112976723,
+        "H0_blend": 0.8413172943492356,
+        "H1_blend": 0.8403294872383318,
+        "H5_stack": 0.8381745934935928
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H3_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_6": {
+      "final_auc": 0.6927516171959652,
+      "per_source_auc": {
+        "H5_stack": 0.6927829459203978,
+        "H0_blend": 0.6921373884089228,
+        "H3_blend": 0.6918883787002235,
+        "H1_blend": 0.6914747976040786
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_7": {
+      "final_auc": 0.7668378076627314,
+      "per_source_auc": {
+        "H0_blend": 0.7662775453546227,
+        "H3_blend": 0.76617735782673,
+        "H1_blend": 0.765851802014339,
+        "H5_stack": 0.7652181405622125
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H3_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_8": {
+      "final_auc": 0.934939629452377,
+      "per_source_auc": {
+        "H0_blend": 0.934482824347013,
+        "H3_blend": 0.934422940173144,
+        "H1_blend": 0.934067920005863,
+        "H5_stack": 0.9313576264220385
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H3_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_10_1": {
+      "final_auc": 0.7569020574516666,
+      "per_source_auc": {
+        "H5_stack": 0.7567140637712179,
+        "H3_blend": 0.7552865355219105,
+        "H0_blend": 0.7552794444788808,
+        "H1_blend": 0.7550416735573325
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H5_stack",
+            "weight": 0.65
+          },
+          {
+            "label": "H3_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    }
+  },
+  "macro_auc": 0.8312926616885304
+}

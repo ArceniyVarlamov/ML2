@@ -1,0 +1,838 @@
+{
+  "mode": "top2_weighted",
+  "sources": [
+    {
+      "label": "H0_blend",
+      "oof_path": "artifacts_fast_base/ensemble/blend_oof.parquet",
+      "test_path": "artifacts_fast_base/ensemble/blend_test.parquet"
+    },
+    {
+      "label": "H1_blend",
+      "oof_path": "artifacts_fast_h1_quantize_lite_v2/ensemble/blend_oof.parquet",
+      "test_path": "artifacts_fast_h1_quantize_lite_v2/ensemble/blend_test.parquet"
+    }
+  ],
+  "targets": {
+    "target_1_1": {
+      "final_auc": 0.9137596261689453,
+      "per_source_auc": {
+        "H0_blend": 0.9132011264052999,
+        "H1_blend": 0.9124833018819754
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_1_2": {
+      "final_auc": 0.8229488505143998,
+      "per_source_auc": {
+        "H0_blend": 0.8207871779974817,
+        "H1_blend": 0.8200717407509069
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_1_3": {
+      "final_auc": 0.8706109700254447,
+      "per_source_auc": {
+        "H1_blend": 0.8699227991210562,
+        "H0_blend": 0.8698479847884781
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H1_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_1_4": {
+      "final_auc": 0.8347129318708243,
+      "per_source_auc": {
+        "H0_blend": 0.8339844764915255,
+        "H1_blend": 0.833148017443303
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_1_5": {
+      "final_auc": 0.8806725477635016,
+      "per_source_auc": {
+        "H0_blend": 0.8777586801007353,
+        "H1_blend": 0.8772225732767402
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_1": {
+      "final_auc": 0.8268325124752114,
+      "per_source_auc": {
+        "H0_blend": 0.8252336846234786,
+        "H1_blend": 0.8250145997711135
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_2": {
+      "final_auc": 0.9375447549608565,
+      "per_source_auc": {
+        "H0_blend": 0.9372965928327563,
+        "H1_blend": 0.9369153109710877
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_3": {
+      "final_auc": 0.8062653543970776,
+      "per_source_auc": {
+        "H0_blend": 0.8028213573504385,
+        "H1_blend": 0.7980262316551345
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_4": {
+      "final_auc": 0.7447727886709021,
+      "per_source_auc": {
+        "H0_blend": 0.7420457946102437,
+        "H1_blend": 0.7398281038185214
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_5": {
+      "final_auc": 0.7670910590825549,
+      "per_source_auc": {
+        "H0_blend": 0.7617885805631762,
+        "H1_blend": 0.7566276632412394
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_6": {
+      "final_auc": 0.7451576604149892,
+      "per_source_auc": {
+        "H0_blend": 0.7412724589413324,
+        "H1_blend": 0.7399646873541448
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_7": {
+      "final_auc": 0.865996757397427,
+      "per_source_auc": {
+        "H0_blend": 0.8624279797437193,
+        "H1_blend": 0.8571303880867414
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_2_8": {
+      "final_auc": 0.991418552327823,
+      "per_source_auc": {
+        "H0_blend": 0.990121637718269,
+        "H1_blend": 0.9894061368494258
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_3_1": {
+      "final_auc": 0.6950002142248181,
+      "per_source_auc": {
+        "H0_blend": 0.6943083205861416,
+        "H1_blend": 0.6936461450688938
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_3_2": {
+      "final_auc": 0.9097753547671273,
+      "per_source_auc": {
+        "H0_blend": 0.9096090966459728,
+        "H1_blend": 0.9095840751744916
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_3_3": {
+      "final_auc": 0.7721098250073233,
+      "per_source_auc": {
+        "H0_blend": 0.768318747985437,
+        "H1_blend": 0.7632694302857368
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_3_4": {
+      "final_auc": 0.9482492033009454,
+      "per_source_auc": {
+        "H0_blend": 0.9480313039176334,
+        "H1_blend": 0.944185610877095
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_3_5": {
+      "final_auc": 0.974398360540686,
+      "per_source_auc": {
+        "H1_blend": 0.9739486444349997,
+        "H0_blend": 0.9732620199578925
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H1_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_4_1": {
+      "final_auc": 0.8501592793408965,
+      "per_source_auc": {
+        "H0_blend": 0.8488861687706862,
+        "H1_blend": 0.8487236558056396
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_5_1": {
+      "final_auc": 0.7491328154061506,
+      "per_source_auc": {
+        "H1_blend": 0.7472381278074813,
+        "H0_blend": 0.7457891773801371
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H1_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_5_2": {
+      "final_auc": 0.7266825679235819,
+      "per_source_auc": {
+        "H1_blend": 0.7227077407263485,
+        "H0_blend": 0.7196659567729302
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H1_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_6_1": {
+      "final_auc": 0.7297450201217429,
+      "per_source_auc": {
+        "H0_blend": 0.7275079359710013,
+        "H1_blend": 0.7270110347399987
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_6_2": {
+      "final_auc": 0.729904984515403,
+      "per_source_auc": {
+        "H0_blend": 0.7269816010806347,
+        "H1_blend": 0.7269798051012369
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_6_3": {
+      "final_auc": 0.7570830094467348,
+      "per_source_auc": {
+        "H0_blend": 0.7541532811401042,
+        "H1_blend": 0.7536461764566778
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_6_4": {
+      "final_auc": 0.851795606259481,
+      "per_source_auc": {
+        "H1_blend": 0.8509283977491101,
+        "H0_blend": 0.8499343427348118
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H1_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_6_5": {
+      "final_auc": 0.9291440444155342,
+      "per_source_auc": {
+        "H0_blend": 0.9273971528131902,
+        "H1_blend": 0.9263919627665083
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_7_1": {
+      "final_auc": 0.811917202591289,
+      "per_source_auc": {
+        "H0_blend": 0.8114005657372444,
+        "H1_blend": 0.8110119830110816
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_7_2": {
+      "final_auc": 0.863323087356368,
+      "per_source_auc": {
+        "H0_blend": 0.862339279307747,
+        "H1_blend": 0.8623132792125083
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_7_3": {
+      "final_auc": 0.7920472146597242,
+      "per_source_auc": {
+        "H1_blend": 0.7863361853074692,
+        "H0_blend": 0.7861265819033115
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H1_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H0_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_8_1": {
+      "final_auc": 0.9820037138702955,
+      "per_source_auc": {
+        "H0_blend": 0.9819401906731664,
+        "H1_blend": 0.981785035619988
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_8_2": {
+      "final_auc": 0.8551627623935554,
+      "per_source_auc": {
+        "H0_blend": 0.854444983753289,
+        "H1_blend": 0.8540629992539694
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_8_3": {
+      "final_auc": 0.8758921007273679,
+      "per_source_auc": {
+        "H0_blend": 0.8753339673967209,
+        "H1_blend": 0.8743067018261059
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_1": {
+      "final_auc": 0.7789975046028438,
+      "per_source_auc": {
+        "H0_blend": 0.777061152350091,
+        "H1_blend": 0.7748247039676504
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_2": {
+      "final_auc": 0.8393923216342716,
+      "per_source_auc": {
+        "H0_blend": 0.8388791635216126,
+        "H1_blend": 0.8386184343042891
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_3": {
+      "final_auc": 0.6853484299219322,
+      "per_source_auc": {
+        "H0_blend": 0.6834676806455791,
+        "H1_blend": 0.6832961748643945
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_4": {
+      "final_auc": 0.910940875699774,
+      "per_source_auc": {
+        "H0_blend": 0.9091437269172757,
+        "H1_blend": 0.9087826966215949
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_5": {
+      "final_auc": 0.8424734129635808,
+      "per_source_auc": {
+        "H0_blend": 0.8413172943492356,
+        "H1_blend": 0.8403294872383318
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_6": {
+      "final_auc": 0.6923905742841696,
+      "per_source_auc": {
+        "H0_blend": 0.6921373884089228,
+        "H1_blend": 0.6914747976040786
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_7": {
+      "final_auc": 0.7667733314580627,
+      "per_source_auc": {
+        "H0_blend": 0.7662775453546227,
+        "H1_blend": 0.765851802014339
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_9_8": {
+      "final_auc": 0.9348538572030162,
+      "per_source_auc": {
+        "H0_blend": 0.934482824347013,
+        "H1_blend": 0.934067920005863
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    },
+    "target_10_1": {
+      "final_auc": 0.7554776071920811,
+      "per_source_auc": {
+        "H0_blend": 0.7552794444788808,
+        "H1_blend": 0.7550416735573325
+      },
+      "chosen": {
+        "strategy": "top2_weighted",
+        "sources": [
+          {
+            "label": "H0_blend",
+            "weight": 0.65
+          },
+          {
+            "label": "H1_blend",
+            "weight": 0.35
+          }
+        ]
+      }
+    }
+  },
+  "macro_auc": 0.8297063084853347
+}
