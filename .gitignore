@@ -1,0 +1,40 @@
+# Virtual env
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Catboost training logs (тяжёлые и генерируемые)
+catboost_info/
+
+# Артефакты пайплайна — предсказания, OOF, сабмиты (тяжёлые)
+artifacts_fast_*/
+artifacts_cross_hyp/ensemble/
+artifacts_cross_hyp/submissions/
+artifacts_cross_hyp/base/
+# Лёгкие отчёты в artifacts_cross_hyp/reports/ и artifacts_analysis/ оставляем при желании
+
+# Данные обучения/теста, если большие (раскомментируйте при необходимости)
+# Data/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE
+.idea/
+.vscode/
+*.code-workspace
+
+# Jupyter
+.ipynb_checkpoints/
