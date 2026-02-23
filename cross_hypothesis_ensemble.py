@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 from typing import Any, Dict, List
@@ -30,6 +31,72 @@ def parse_sources(items: List[str]) -> List[Dict[str, str]]:
         label, oof_path, test_path = parts
         out.append({"label": label, "oof_path": oof_path, "test_path": test_path})
     return out
+
+
+def load_json_or_yaml(path: Path) -> Any:
+    suffix = path.suffix.lower()
+    text = path.read_text(encoding="utf-8")
+    if suffix in {".yaml", ".yml"}:
+        try:
+            import yaml  # type: ignore
+        except Exception as exc:
+            raise ImportError(
+                "YAML manifest requires PyYAML. Install via: pip install pyyaml"
+            ) from exc
+        return yaml.safe_load(text)
+    return json.loads(text)
+
+
+def parse_sources_manifest(path: Path) -> List[Dict[str, str]]:
+    payload = load_json_or_yaml(path)
+    if isinstance(payload, dict):
+        raw_sources = payload.get("sources", payload.get("items"))
+        if raw_sources is None:
+            raise ValueError(f"Manifest {path} must contain 'sources' list")
+    elif isinstance(payload, list):
+        raw_sources = payload
+    else:
+        raise ValueError(f"Manifest {path} must be a list or dict with 'sources'")
+
+    out: List[Dict[str, str]] = []
+    for idx, item in enumerate(raw_sources):
+        if not isinstance(item, dict):
+            raise ValueError(f"Manifest source #{idx} must be an object")
+        label = item.get("label")
+        oof_path = item.get("oof_path")
+        test_path = item.get("test_path")
+        if not all([label, oof_path, test_path]):
+            raise ValueError(
+                f"Manifest source #{idx} must contain label/oof_path/test_path"
+            )
+        out.append(
+            {
+                "label": str(label),
+                "oof_path": str(oof_path),
+                "test_path": str(test_path),
+            }
+        )
+    return out
+
+
+def sha256_file(path: Path, chunk_size: int = 1 << 20) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        while True:
+            chunk = f.read(chunk_size)
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def source_signature(src: Dict[str, str]) -> Dict[str, str]:
+    oof_p = Path(src["oof_path"])
+    test_p = Path(src["test_path"])
+    return {
+        "oof_sha256": sha256_file(oof_p),
+        "test_sha256": sha256_file(test_p),
+    }
 
 
 def ensure_same_ids(dfs: List[pd.DataFrame], id_col: str, name: str) -> None:
@@ -182,8 +249,13 @@ def main() -> None:
     p.add_argument(
         "--source",
         action="append",
-        required=True,
+        default=[],
         help="Source in format label:oof_path:test_path. Repeat --source multiple times.",
+    )
+    p.add_argument(
+        "--source-manifest",
+        default=None,
+        help="Path to JSON/YAML manifest with sources (list or {sources:[...]}).",
     )
     p.add_argument(
         "--mode",
@@ -237,6 +309,36 @@ def main() -> None:
         default=42,
         help="Random seed for optimize_weights row sampling",
     )
+    p.add_argument(
+        "--max-sources-per-target",
+        type=int,
+        default=0,
+        help="Cap candidate sources per target after sorting/filtering (0=off).",
+    )
+    p.add_argument(
+        "--min-delta-auc",
+        type=float,
+        default=0.0,
+        help=(
+            "Keep only sources within this OOF AUC gap from the best source per target "
+            "(0=off). The best source is always kept."
+        ),
+    )
+    p.add_argument(
+        "--check-duplicates",
+        action="store_true",
+        help="Check duplicate sources by SHA256 of OOF+test parquet and fail if found.",
+    )
+    p.add_argument(
+        "--allow-partial-sources",
+        action="store_true",
+        help="Allow sources that contain only a subset of targets (useful for specialist models).",
+    )
+    p.add_argument(
+        "--experiment-log",
+        default=None,
+        help="Optional JSONL experiment log path to append ensemble run summary.",
+    )
     p.add_argument("--out-parquet", required=True, help="Output submission parquet path")
     p.add_argument("--out-report", required=True, help="Output JSON report path")
     args = p.parse_args()
@@ -245,7 +347,27 @@ def main() -> None:
     target_cols = [c for c in train_target.columns if c.startswith("target_")]
     sample = pd.read_parquet(args.sample_submit)
 
-    sources = parse_sources(args.source)
+    sources: List[Dict[str, str]] = []
+    if args.source_manifest:
+        sources.extend(parse_sources_manifest(Path(args.source_manifest)))
+    if args.source:
+        sources.extend(parse_sources(args.source))
+    if not sources:
+        raise ValueError("Provide at least one source via --source or --source-manifest")
+    labels = [s["label"] for s in sources]
+    if len(set(labels)) != len(labels):
+        raise ValueError("Duplicate source labels are not allowed")
+    if args.check_duplicates:
+        seen_signatures: Dict[tuple[str, str], str] = {}
+        for src in sources:
+            sig = source_signature(src)
+            src["signature"] = sig
+            key = (sig["oof_sha256"], sig["test_sha256"])
+            if key in seen_signatures:
+                raise ValueError(
+                    f"Duplicate source content detected: {src['label']} matches {seen_signatures[key]}"
+                )
+            seen_signatures[key] = src["label"]
     oof_dfs = [pd.read_parquet(s["oof_path"]) for s in sources]
     test_dfs = [pd.read_parquet(s["test_path"]) for s in sources]
 
@@ -256,6 +378,12 @@ def main() -> None:
     report = {
         "mode": args.mode,
         "sources": sources,
+        "selection_params": {
+            "max_sources_per_target": int(args.max_sources_per_target),
+            "min_delta_auc": float(args.min_delta_auc),
+            "check_duplicates": bool(args.check_duplicates),
+            "allow_partial_sources": bool(args.allow_partial_sources),
+        },
         "opt_params": {
             "alpha": float(args.opt_alpha),
             "min_weight": float(args.opt_min_weight),
@@ -266,9 +394,19 @@ def main() -> None:
             "seed": int(args.opt_seed),
         },
         "targets": {},
+        "source_usage": {},
         "macro_auc": None,
     }
     aucs: List[float] = []
+    usage_summary: Dict[str, Dict[str, Any]] = {
+        s["label"]: {
+            "targets_selected_count": 0,
+            "weight_sum": 0.0,
+            "max_weight_seen": 0.0,
+            "candidate_pool_count": 0,
+        }
+        for s in sources
+    }
 
     for target in target_cols:
         y = train_target[target].to_numpy(dtype=np.int8, copy=False)
@@ -277,10 +415,19 @@ def main() -> None:
         per_source = []
         for src, oof_df, test_df in zip(sources, oof_dfs, test_dfs):
             if target not in oof_df.columns:
+                if args.allow_partial_sources:
+                    continue
                 raise KeyError(f"Missing target column '{target}' in {src['oof_path']}")
             pcol = target_to_predict_col(target)
-            if pcol not in test_df.columns:
-                raise KeyError(f"Missing predict column '{pcol}' in {src['test_path']}")
+            if pcol in test_df.columns:
+                test_arr = test_df[pcol].to_numpy(dtype=np.float64, copy=False)
+            elif target in test_df.columns:
+                # Allow base predictions saved with target_* names in test files.
+                test_arr = test_df[target].to_numpy(dtype=np.float64, copy=False)
+            else:
+                if args.allow_partial_sources:
+                    continue
+                raise KeyError(f"Missing predict column '{pcol}' (or '{target}') in {src['test_path']}")
 
             oof_pred = oof_df[target].to_numpy(dtype=np.float64, copy=False)
             auc = float(roc_auc_score(y, oof_pred)) if not is_constant_target else float("nan")
@@ -289,46 +436,79 @@ def main() -> None:
                     "label": src["label"],
                     "auc": auc,
                     "oof_pred": oof_pred,
-                    "test_pred": test_df[pcol].to_numpy(dtype=np.float64, copy=False),
+                    "test_pred": test_arr,
                 }
+            )
+        if not per_source:
+            raise ValueError(
+                f"No available sources for target={target}. "
+                "If using specialists, ensure at least one fallback source covers every target."
             )
 
         per_source.sort(key=lambda x: x["auc"], reverse=True)
+        candidate_pool = list(per_source)
+        if (not is_constant_target) and float(args.min_delta_auc) > 0.0 and candidate_pool:
+            best_auc = float(candidate_pool[0]["auc"])
+            filtered = [candidate_pool[0]]
+            for src_item in candidate_pool[1:]:
+                if (best_auc - float(src_item["auc"])) <= float(args.min_delta_auc):
+                    filtered.append(src_item)
+            # Preserve minimum width for top2 mode if available.
+            if args.mode == "top2_weighted" and len(filtered) < min(2, len(candidate_pool)):
+                filtered = list(candidate_pool[: min(2, len(candidate_pool))])
+            candidate_pool = filtered
+
+        if int(args.max_sources_per_target) > 0 and len(candidate_pool) > int(args.max_sources_per_target):
+            max_n = int(args.max_sources_per_target)
+            if args.mode == "top2_weighted":
+                max_n = max(max_n, min(2, len(candidate_pool)))
+            candidate_pool = candidate_pool[:max_n]
+
+        for src_item in candidate_pool:
+            usage_summary[src_item["label"]]["candidate_pool_count"] += 1
 
         if args.mode == "winner":
-            best = per_source[0]
+            best = candidate_pool[0]
             oof_final = best["oof_pred"]
             test_final = best["test_pred"]
             chosen = {"strategy": "winner", "sources": [{"label": best["label"], "weight": 1.0}]}
         elif args.mode == "top2_weighted":
-            top = per_source[:2]
-            w1, w2 = 0.65, 0.35
-            oof_final = w1 * top[0]["oof_pred"] + w2 * top[1]["oof_pred"]
-            test_final = w1 * top[0]["test_pred"] + w2 * top[1]["test_pred"]
-            chosen = {
-                "strategy": "top2_weighted",
-                "sources": [
-                    {"label": top[0]["label"], "weight": w1},
-                    {"label": top[1]["label"], "weight": w2},
-                ],
-            }
+            top = candidate_pool[:2]
+            if len(top) == 1:
+                oof_final = top[0]["oof_pred"]
+                test_final = top[0]["test_pred"]
+                chosen = {
+                    "strategy": "top2_weighted",
+                    "sources": [{"label": top[0]["label"], "weight": 1.0}],
+                }
+            else:
+                w1, w2 = 0.65, 0.35
+                oof_final = w1 * top[0]["oof_pred"] + w2 * top[1]["oof_pred"]
+                test_final = w1 * top[0]["test_pred"] + w2 * top[1]["test_pred"]
+                chosen = {
+                    "strategy": "top2_weighted",
+                    "sources": [
+                        {"label": top[0]["label"], "weight": w1},
+                        {"label": top[1]["label"], "weight": w2},
+                    ],
+                }
         else:
             if is_constant_target:
-                n_sources = len(per_source)
+                n_sources = len(candidate_pool)
                 w = np.full(n_sources, 1.0 / max(n_sources, 1), dtype=np.float64)
-                oof_final = np.column_stack([x["oof_pred"] for x in per_source]) @ w
-                test_final = np.column_stack([x["test_pred"] for x in per_source]) @ w
+                oof_final = np.column_stack([x["oof_pred"] for x in candidate_pool]) @ w
+                test_final = np.column_stack([x["test_pred"] for x in candidate_pool]) @ w
                 chosen = {
                     "strategy": "optimize_weights",
                     "sources": [
                         {"label": src["label"], "weight": float(weight)}
-                        for src, weight in zip(per_source, w)
+                        for src, weight in zip(candidate_pool, w)
                     ],
                     "optimizer": {"success": True, "message": "constant target"},
                 }
             else:
-                oof_matrix = np.column_stack([x["oof_pred"] for x in per_source])
-                test_matrix = np.column_stack([x["test_pred"] for x in per_source])
+                oof_matrix = np.column_stack([x["oof_pred"] for x in candidate_pool])
+                test_matrix = np.column_stack([x["test_pred"] for x in candidate_pool])
                 fit_idx = sample_rows_binary(
                     y=y,
                     max_rows=int(args.opt_max_rows),
@@ -351,7 +531,7 @@ def main() -> None:
                     "strategy": "optimize_weights",
                     "sources": [
                         {"label": src["label"], "weight": float(weight)}
-                        for src, weight in zip(per_source, w_opt)
+                        for src, weight in zip(candidate_pool, w_opt)
                     ],
                     "optimizer": {
                         **meta,
@@ -367,25 +547,70 @@ def main() -> None:
 
         pcol = target_to_predict_col(target)
         submission[pcol] = pd.Series(test_final).astype(sample[pcol].dtype)
+        for src_meta in chosen.get("sources", []):
+            label = str(src_meta["label"])
+            w = float(src_meta["weight"])
+            usage_summary[label]["targets_selected_count"] += 1
+            usage_summary[label]["weight_sum"] += w
+            usage_summary[label]["max_weight_seen"] = max(
+                float(usage_summary[label]["max_weight_seen"]), w
+            )
         report["targets"][target] = {
             "final_auc": auc_final,
             "per_source_auc": {x["label"]: x["auc"] for x in per_source},
+            "candidate_pool": [
+                {
+                    "label": x["label"],
+                    "auc": x["auc"],
+                }
+                for x in candidate_pool
+            ],
             "chosen": chosen,
         }
 
     report["macro_auc"] = float(np.mean(aucs)) if aucs else float("nan")
-    report_path = Path(args.out_report)
-    report_path.parent.mkdir(parents=True, exist_ok=True)
-    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    report["source_usage"] = {
+        label: {
+            **stats,
+            "avg_weight_when_selected": (
+                float(stats["weight_sum"]) / max(int(stats["targets_selected_count"]), 1)
+            ),
+        }
+        for label, stats in usage_summary.items()
+    }
 
     submission = submission[sample.columns.tolist()]
     out_path = Path(args.out_parquet)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     submission.to_parquet(out_path, index=False)
+    report["out_parquet"] = str(out_path)
+    report["out_parquet_sha256"] = sha256_file(out_path)
+    report_path = Path(args.out_report)
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(f"Saved ensemble submission: {out_path}")
     print(f"Saved ensemble report: {report_path}")
     print(f"OOF macro AUC: {report['macro_auc']:.6f}")
+    if args.experiment_log:
+        exp_path = Path(args.experiment_log)
+        exp_path.parent.mkdir(parents=True, exist_ok=True)
+        with exp_path.open("a", encoding="utf-8") as f:
+            f.write(
+                json.dumps(
+                    {
+                        "event": "cross_hyp_ensemble",
+                        "mode": args.mode,
+                        "macro_auc": report["macro_auc"],
+                        "out_parquet": str(out_path),
+                        "out_parquet_sha256": report["out_parquet_sha256"],
+                        "report_path": str(report_path),
+                        "sources": [s["label"] for s in sources],
+                    },
+                    ensure_ascii=False,
+                )
+                + "\n"
+            )
 
 
 if __name__ == "__main__":

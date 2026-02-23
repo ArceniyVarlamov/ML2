@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Sequence
 
@@ -56,6 +58,245 @@ def parse_int_list(value: Any) -> List[int]:
     return []
 
 
+def parse_str_list(value: Any) -> List[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        return [x.strip() for x in value.split(",") if x.strip()]
+    if isinstance(value, list):
+        return [str(x).strip() for x in value if str(x).strip()]
+    return [str(value).strip()] if str(value).strip() else []
+
+
+def load_list_like_file(path: Path) -> List[str]:
+    if not path.exists():
+        raise FileNotFoundError(path)
+    if path.suffix.lower() in {".txt", ".lst"}:
+        return [line.strip() for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(payload, list):
+        return [str(x) for x in payload]
+    if isinstance(payload, dict):
+        for key in [
+            "columns",
+            "extra_columns",
+            "targets",
+            "include",
+            "exclude",
+            "pseudo_categorical_cols",
+            "pseudo_cat_cols",
+        ]:
+            value = payload.get(key)
+            if isinstance(value, list):
+                return [str(x) for x in value]
+    raise ValueError(f"Unsupported list file format: {path}")
+
+
+def sha256_file(path: Path, chunk_size: int = 1 << 20) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        while True:
+            chunk = f.read(chunk_size)
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def append_experiment_log(cfg: Dict[str, Any], event: str, payload: Dict[str, Any]) -> None:
+    tracking_cfg = cfg.get("tracking", {})
+    log_path_cfg = tracking_cfg.get("experiment_log") or tracking_cfg.get("experiment_log_path")
+    if log_path_cfg:
+        log_path = Path(str(log_path_cfg))
+    else:
+        log_path = Path(cfg["output_dir"]) / "scores" / "experiment_log.jsonl"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    record = {
+        "ts_utc": datetime.now(timezone.utc).isoformat(),
+        "event": event,
+        "output_dir": str(cfg.get("output_dir", "")),
+        **payload,
+    }
+    with log_path.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+
+def get_targets_cfg(cfg: Dict[str, Any]) -> Dict[str, Any]:
+    return cfg.get("targets", {})
+
+
+def load_target_groups(cfg: Dict[str, Any]) -> Dict[str, List[str]]:
+    cache_key = "__target_groups_cache__"
+    if cache_key in cfg:
+        return cfg[cache_key]
+
+    targets_cfg = get_targets_cfg(cfg)
+    file_path = (
+        targets_cfg.get("target_groups_file")
+        or targets_cfg.get("groups_file")
+        or cfg.get("target_groups_file")
+    )
+    groups_inline = targets_cfg.get("groups_map")
+
+    groups: Dict[str, List[str]] = {}
+    if file_path:
+        p = Path(str(file_path))
+        if p.exists():
+            payload = json.loads(p.read_text(encoding="utf-8"))
+            if isinstance(payload, dict) and isinstance(payload.get("groups"), dict):
+                payload = payload["groups"]
+            if isinstance(payload, dict):
+                for g, targets in payload.items():
+                    if isinstance(targets, list):
+                        groups[str(g)] = [str(t) for t in targets]
+            else:
+                raise ValueError(f"target groups file must be dict or {{groups:...}}: {p}")
+        else:
+            raise FileNotFoundError(f"target groups file not found: {p}")
+    elif isinstance(groups_inline, dict):
+        for g, targets in groups_inline.items():
+            if isinstance(targets, list):
+                groups[str(g)] = [str(t) for t in targets]
+
+    cfg[cache_key] = groups
+    return groups
+
+
+def filter_target_columns(cfg: Dict[str, Any], target_cols: Sequence[str]) -> List[str]:
+    targets_cfg = get_targets_cfg(cfg)
+    include = set(
+        parse_str_list(targets_cfg.get("include"))
+        + parse_str_list(cfg.get("targets_include"))
+    )
+    exclude = set(
+        parse_str_list(targets_cfg.get("exclude"))
+        + parse_str_list(cfg.get("targets_exclude"))
+    )
+    group_names = parse_str_list(targets_cfg.get("groups")) + parse_str_list(targets_cfg.get("group"))
+    group_names = list(dict.fromkeys(group_names))
+    if group_names:
+        groups_map = load_target_groups(cfg)
+        group_targets: List[str] = []
+        for g in group_names:
+            if g not in groups_map:
+                raise KeyError(f"Unknown target group '{g}' in config")
+            group_targets.extend(groups_map[g])
+        include.update(group_targets)
+
+    ordered = [t for t in target_cols if (not include or t in include) and t not in exclude]
+    if len(ordered) != len(target_cols):
+        print(
+            f"[targets] filtered targets: total={len(target_cols)} kept={len(ordered)} "
+            f"include={len(include) if include else 'all'} exclude={len(exclude)} groups={group_names or []}"
+        )
+    return ordered
+
+
+def target_groups_for_target(cfg: Dict[str, Any], target: str) -> List[str]:
+    groups_map = load_target_groups(cfg)
+    if not groups_map:
+        return []
+    out = [g for g, targets in groups_map.items() if target in set(targets)]
+    return out
+
+
+def load_feature_list_from_cfg(
+    cfg: Dict[str, Any],
+    *,
+    inline_key: str,
+    file_key: str,
+) -> List[str]:
+    features_cfg = cfg.get("features", {})
+    out: List[str] = []
+    out.extend(parse_str_list(features_cfg.get(inline_key)))
+    file_path = features_cfg.get(file_key)
+    if file_path:
+        p = Path(str(file_path))
+        if p.exists():
+            try:
+                out.extend(load_list_like_file(p))
+            except Exception as exc:
+                raise ValueError(f"Failed to load {file_key} from {p}: {exc}") from exc
+        else:
+            raise FileNotFoundError(f"{file_key} not found: {p}")
+    return list(dict.fromkeys([str(x) for x in out]))
+
+
+def get_feature_drop_columns(cfg: Dict[str, Any]) -> List[str]:
+    return load_feature_list_from_cfg(
+        cfg,
+        inline_key="drop_columns",
+        file_key="drop_columns_file",
+    )
+
+
+def apply_feature_drop_list(
+    cfg: Dict[str, Any],
+    feature_cols: Sequence[str],
+    cat_cols: Sequence[str],
+) -> tuple[List[str], List[str], List[str]]:
+    drop_cols = set(get_feature_drop_columns(cfg))
+    if not drop_cols:
+        return list(feature_cols), list(cat_cols), []
+    kept_features = [c for c in feature_cols if c not in drop_cols]
+    kept_cat = [c for c in cat_cols if c not in drop_cols]
+    dropped = [c for c in feature_cols if c in drop_cols]
+    if dropped:
+        print(f"[features] dropped columns from feature set: {len(dropped)}")
+    return kept_features, kept_cat, dropped
+
+
+def apply_extra_keep_filter(cfg: Dict[str, Any], extra_cols: Sequence[str]) -> List[str]:
+    keep_cols = set(
+        load_feature_list_from_cfg(
+            cfg,
+            inline_key="keep_extra_cols",
+            file_key="keep_extra_file",
+        )
+    )
+    if not keep_cols:
+        return list(extra_cols)
+    kept = [c for c in extra_cols if c in keep_cols]
+    print(
+        f"[features] keep_extra applied: requested={len(keep_cols)} available={len(extra_cols)} kept={len(kept)}"
+    )
+    return kept
+
+
+def resolve_model_params_for_target(
+    cfg: Dict[str, Any],
+    model_name: str,
+    model_cfg: Dict[str, Any],
+    target: str,
+) -> Dict[str, Any]:
+    params = dict(model_cfg["params"])
+
+    exact_overrides = model_cfg.get("params_by_target", {})
+    if isinstance(exact_overrides, dict):
+        target_override = exact_overrides.get(target)
+        if isinstance(target_override, dict):
+            params.update(target_override)
+
+    group_overrides = model_cfg.get("model_overrides_by_target_group", {})
+    if isinstance(group_overrides, dict) and group_overrides:
+        groups = target_groups_for_target(cfg, target)
+        for group_name, override in group_overrides.items():
+            if group_name in groups and isinstance(override, dict):
+                params.update(override)
+
+    global_group_overrides = cfg.get("model_overrides_by_target_group", {})
+    if isinstance(global_group_overrides, dict):
+        model_group_overrides = global_group_overrides.get(model_name, {})
+        if isinstance(model_group_overrides, dict):
+            groups = target_groups_for_target(cfg, target)
+            for group_name, override in model_group_overrides.items():
+                if group_name in groups and isinstance(override, dict):
+                    params.update(override)
+
+    return params
+
+
 def load_pseudo_cat_cols(cfg: Dict[str, Any], feature_cols: Sequence[str]) -> List[str]:
     features_cfg = cfg.get("features", {})
     feature_set = set(feature_cols)
@@ -105,7 +346,9 @@ def discover_columns(cfg: Dict[str, Any]) -> Dict[str, List[str]]:
         c for c in train_main_cols if c.startswith("num_feature") or c.startswith("cat_feature")
     ]
     target_cols = [c for c in train_target_cols if c.startswith("target_")]
+    target_cols = filter_target_columns(cfg, target_cols)
     extra_cols = [c for c in train_extra_cols if c != "customer_id"]
+    extra_cols = apply_extra_keep_filter(cfg, extra_cols)
     cat_cols = [c for c in feature_cols_main if c.startswith("cat_feature")]
 
     return {
@@ -117,6 +360,10 @@ def discover_columns(cfg: Dict[str, Any]) -> Dict[str, List[str]]:
 
 
 def select_extra_columns(cfg: Dict[str, Any], available_extra_cols: Sequence[str]) -> List[str]:
+    drop_cols = set(get_feature_drop_columns(cfg))
+    dropped_extra_n = sum(1 for c in available_extra_cols if c in drop_cols)
+    if dropped_extra_n:
+        print(f"[select_extra_columns] raw extra drop filter active: {dropped_extra_n} columns")
     top_k = int(cfg["features"].get("extra_top_k", 0))
     rank_start = max(0, int(cfg["features"].get("extra_rank_start", 0)))
     rank_size = int(cfg["features"].get("extra_rank_size", 0))
@@ -139,6 +386,7 @@ def select_extra_columns(cfg: Dict[str, Any], available_extra_cols: Sequence[str
             "[select_extra_columns] first_k selection: "
             f"top_k={top_k}, rank_start={rank_start}, rank_size={rank_size if rank_size > 0 else 'all'}"
         )
+        sliced = [c for c in sliced if c not in drop_cols]
         return list(sliced)
 
     print(
@@ -155,6 +403,7 @@ def select_extra_columns(cfg: Dict[str, Any], available_extra_cols: Sequence[str
         sliced = ranked[rank_start:]
     else:
         sliced = ranked[rank_start : rank_start + rank_size]
+    sliced = [c for c in sliced if c not in drop_cols]
     return list(sliced)
 
 
@@ -505,6 +754,8 @@ def prepare_dataset(cfg: Dict[str, Any]) -> Dict[str, Any]:
     svd_cols = add_svd_features(cfg, train_df, test_df, selected_extra_cols)
     feature_cols.extend(svd_cols)
 
+    feature_cols, cat_cols, dropped_feature_cols = apply_feature_drop_list(cfg, feature_cols, cat_cols)
+
     fold_path = out_dir / "meta" / "fold_ids.npy"
     np.save(fold_path, fold_ids)
 
@@ -518,9 +769,13 @@ def prepare_dataset(cfg: Dict[str, Any]) -> Dict[str, Any]:
         "quantized_cols": quantized_cols,
         "te_cols": te_cols,
         "svd_cols": svd_cols,
+        "dropped_feature_cols": dropped_feature_cols,
+        "targets_cfg": cfg.get("targets", {}),
     }
     with (out_dir / "meta" / "columns.json").open("w", encoding="utf-8") as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)
+    with (out_dir / "meta" / "config_snapshot.json").open("w", encoding="utf-8") as f:
+        json.dump(cfg, f, ensure_ascii=False, indent=2)
 
     return {
         "train_df": train_df,
@@ -834,6 +1089,7 @@ def train_base_model(
     oof_df = pd.DataFrame({"customer_id": train_df["customer_id"].values})
     test_pred_df = pd.DataFrame({"customer_id": test_df["customer_id"].values})
     target_scores: Dict[str, float] = {}
+    target_param_overrides: Dict[str, Dict[str, Any]] = {}
 
     print(f"[train_base_model] model={model_name} targets={len(target_cols)} folds={n_folds}")
     for target in target_cols:
@@ -848,6 +1104,19 @@ def train_base_model(
 
         y = train_df[target].to_numpy(dtype=np.int8, copy=False)
         positives = int(y.sum())
+        target_model_params = resolve_model_params_for_target(
+            cfg=cfg,
+            model_name=model_name,
+            model_cfg=model_cfg,
+            target=target,
+        )
+        # Store only diff vs base params to keep scores file readable.
+        base_params = dict(model_cfg["params"])
+        diff = {
+            k: v for k, v in target_model_params.items() if k not in base_params or base_params[k] != v
+        }
+        if diff:
+            target_param_overrides[target] = diff
         if positives == 0 or positives == len(y):
             constant = float(y.mean())
             oof = np.full(len(y), constant, dtype=np.float32)
@@ -870,7 +1139,7 @@ def train_base_model(
 
             val_pred, fold_test_pred = fit_predict_one_fold(
                 model_name=model_name,
-                model_params=model_cfg["params"],
+                model_params=target_model_params,
                 x_train=x_train,
                 y_train=y_train,
                 x_val=x_val,
@@ -900,9 +1169,21 @@ def train_base_model(
         "model": model_name,
         "macro_auc": macro_auc,
         "target_scores": target_scores,
+        "target_param_overrides": target_param_overrides,
     }
     with (out_dir / "scores" / f"{model_name}_scores.json").open("w", encoding="utf-8") as f:
         json.dump(score_payload, f, ensure_ascii=False, indent=2)
+    append_experiment_log(
+        cfg,
+        event="base_model",
+        payload={
+            "model": model_name,
+            "macro_auc": macro_auc,
+            "targets": len(target_cols),
+            "oof_path": str(oof_path),
+            "test_path": str(test_path),
+        },
+    )
 
 
 def simplex_grid(n_models: int, step: float) -> np.ndarray:
@@ -945,6 +1226,7 @@ def run_blend(cfg: Dict[str, Any], model_names: Sequence[str]) -> None:
 
     train_target = pd.read_parquet(Path(cfg["data"]["train_target"]))
     target_cols = [c for c in train_target.columns if c.startswith("target_")]
+    target_cols = filter_target_columns(cfg, target_cols)
 
     oof_map, test_map = load_base_predictions(out_dir, model_names)
     base_customer = oof_map[model_names[0]]["customer_id"]
@@ -1025,6 +1307,17 @@ def run_blend(cfg: Dict[str, Any], model_names: Sequence[str]) -> None:
     }
     with (out_dir / "scores" / "blend_scores.json").open("w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
+    append_experiment_log(
+        cfg,
+        event="blend",
+        payload={
+            "models": list(model_names),
+            "macro_auc": macro_auc,
+            "targets": len(target_cols),
+            "oof_path": str(out_dir / "ensemble" / "blend_oof.parquet"),
+            "test_path": str(out_dir / "ensemble" / "blend_test.parquet"),
+        },
+    )
 
 
 def run_stack(cfg: Dict[str, Any], model_names: Sequence[str]) -> None:
@@ -1034,6 +1327,7 @@ def run_stack(cfg: Dict[str, Any], model_names: Sequence[str]) -> None:
 
     train_target = pd.read_parquet(Path(cfg["data"]["train_target"]))
     target_cols = [c for c in train_target.columns if c.startswith("target_")]
+    target_cols = filter_target_columns(cfg, target_cols)
     fold_ids = np.load(out_dir / "meta" / "fold_ids.npy")
     n_folds = int(cfg["folds"].get("n_splits", 5))
 
@@ -1138,6 +1432,17 @@ def run_stack(cfg: Dict[str, Any], model_names: Sequence[str]) -> None:
     }
     with (out_dir / "scores" / "stack_scores.json").open("w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
+    append_experiment_log(
+        cfg,
+        event="stack",
+        payload={
+            "models": list(model_names),
+            "macro_auc": macro_auc,
+            "targets": len(target_cols),
+            "oof_path": str(out_dir / "ensemble" / "stack_oof.parquet"),
+            "test_path": str(out_dir / "ensemble" / "stack_test.parquet"),
+        },
+    )
 
 
 def load_feature_only_dataset(
@@ -1172,6 +1477,7 @@ def load_feature_only_dataset(
     cast_numeric_float32(train_df, test_df, feature_cols)
     quantized_cols, train_df, test_df = add_quantized_num_features(cfg, train_df, test_df, feature_cols)
     feature_cols.extend(quantized_cols)
+    feature_cols, cat_cols, _ = apply_feature_drop_list(cfg, feature_cols, cat_cols)
     return train_df, test_df, feature_cols, cat_cols, row_stat_cols
 
 
@@ -1296,12 +1602,28 @@ def run_advval(cfg: Dict[str, Any]) -> None:
     }
     with (out_dir / "scores" / "advval.json").open("w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
+    append_experiment_log(
+        cfg,
+        event="advval",
+        payload={
+            "mean_auc": mean_auc,
+            "shift_detected": is_shift,
+            "top_drift_features_n": len(top_drift_features),
+            "report_path": str(out_dir / "scores" / "advval.json"),
+        },
+    )
 
 
-def make_submission(cfg: Dict[str, Any], source_path: Path, output_path: Path) -> None:
+def make_submission(
+    cfg: Dict[str, Any],
+    source_path: Path,
+    output_path: Path,
+    fallback_source_path: Path | None = None,
+) -> None:
     sample_path = Path(cfg["data"]["sample_submit"])
     sample = pd.read_parquet(sample_path)
     pred = pd.read_parquet(source_path)
+    fallback_pred = pd.read_parquet(fallback_source_path) if fallback_source_path is not None else None
 
     submission = pd.DataFrame()
     for col in sample.columns:
@@ -1321,12 +1643,32 @@ def make_submission(cfg: Dict[str, Any], source_path: Path, output_path: Path) -
             submission[col] = pd.to_numeric(pred[target_col], errors="coerce").astype(expected_dtype)
             continue
 
+        if fallback_pred is not None:
+            if col in fallback_pred.columns:
+                submission[col] = pd.to_numeric(fallback_pred[col], errors="coerce").astype(expected_dtype)
+                continue
+            if target_col in fallback_pred.columns:
+                submission[col] = pd.to_numeric(fallback_pred[target_col], errors="coerce").astype(expected_dtype)
+                continue
+
         raise KeyError(f"Missing required submission column '{col}' in {source_path}")
 
     submission = submission[sample.columns.tolist()]
     output_path.parent.mkdir(parents=True, exist_ok=True)
     submission.to_parquet(output_path, index=False)
     print(f"[submit] saved {output_path}")
+    file_hash = sha256_file(output_path)
+    append_experiment_log(
+        cfg,
+        event="submit",
+        payload={
+            "source_path": str(source_path),
+            "fallback_source_path": str(fallback_source_path) if fallback_source_path else None,
+            "output_path": str(output_path),
+            "file_sha256": file_hash,
+            "rows": int(len(submission)),
+        },
+    )
 
 
 def run_base_models(cfg: Dict[str, Any], selected_models: Sequence[str] | None) -> None:
@@ -1368,6 +1710,21 @@ def run_base_models(cfg: Dict[str, Any], selected_models: Sequence[str] | None) 
         )
 
 
+def run_write_meta(cfg: Dict[str, Any]) -> None:
+    prepared = prepare_dataset(cfg)
+    append_experiment_log(
+        cfg,
+        event="write_meta",
+        payload={
+            "targets": len(prepared["target_cols"]),
+            "features": len(prepared["feature_cols"]),
+            "cat_cols": len(prepared["cat_cols"]),
+            "meta_dir": str(Path(cfg["output_dir"]) / "meta"),
+        },
+    )
+    print(f"[write-meta] saved meta under {Path(cfg['output_dir']) / 'meta'}")
+
+
 def parse_models_arg(text: str | None) -> List[str] | None:
     if text is None:
         return None
@@ -1402,7 +1759,14 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="Prediction parquet path (blend_test.parquet, stack_test.parquet, etc.)",
     )
+    p_submit.add_argument(
+        "--fallback-source",
+        default=None,
+        help="Optional fallback prediction parquet for missing target columns (specialist outputs).",
+    )
     p_submit.add_argument("--output", required=True, help="Final submission parquet path")
+
+    sub.add_parser("write-meta", help="Prepare dataset and write standardized meta (columns/folds) without training")
 
     return p
 
@@ -1435,7 +1799,12 @@ def main() -> None:
         return
 
     if args.command == "submit":
-        make_submission(cfg, Path(args.source), Path(args.output))
+        fallback = Path(args.fallback_source) if getattr(args, "fallback_source", None) else None
+        make_submission(cfg, Path(args.source), Path(args.output), fallback_source_path=fallback)
+        return
+
+    if args.command == "write-meta":
+        run_write_meta(cfg)
         return
 
     raise ValueError(f"Unsupported command: {args.command}")
