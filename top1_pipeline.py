@@ -118,22 +118,44 @@ def discover_columns(cfg: Dict[str, Any]) -> Dict[str, List[str]]:
 
 def select_extra_columns(cfg: Dict[str, Any], available_extra_cols: Sequence[str]) -> List[str]:
     top_k = int(cfg["features"].get("extra_top_k", 0))
+    rank_start = max(0, int(cfg["features"].get("extra_rank_start", 0)))
+    rank_size = int(cfg["features"].get("extra_rank_size", 0))
     method = str(cfg["features"].get("extra_selection", "first_k"))
     sample_rows = int(cfg["features"].get("variance_sample_rows", 120_000))
     train_extra_path = Path(cfg["data"]["train_extra"])
+    n_all = len(available_extra_cols)
 
-    if top_k <= 0 or top_k >= len(available_extra_cols):
-        return list(available_extra_cols)
+    # Candidate pool before slicing.
+    if top_k <= 0 or top_k > n_all:
+        top_k = n_all
 
     if method != "variance":
-        return list(available_extra_cols[:top_k])
+        ranked = list(available_extra_cols[:top_k])
+        if rank_size <= 0:
+            sliced = ranked[rank_start:]
+        else:
+            sliced = ranked[rank_start : rank_start + rank_size]
+        print(
+            "[select_extra_columns] first_k selection: "
+            f"top_k={top_k}, rank_start={rank_start}, rank_size={rank_size if rank_size > 0 else 'all'}"
+        )
+        return list(sliced)
 
-    print(f"[select_extra_columns] variance selection: top_k={top_k}, sample_rows={sample_rows}")
+    print(
+        "[select_extra_columns] variance selection: "
+        f"top_k={top_k}, sample_rows={sample_rows}, rank_start={rank_start}, "
+        f"rank_size={rank_size if rank_size > 0 else 'all'}"
+    )
     sample_df = pl.read_parquet(train_extra_path, columns=list(available_extra_cols), n_rows=sample_rows)
     exprs = [pl.col(c).cast(pl.Float32).fill_null(0.0).var().alias(c) for c in available_extra_cols]
     variances = sample_df.select(exprs).to_pandas().iloc[0]
-    ranked = variances.sort_values(ascending=False).index.tolist()
-    return ranked[:top_k]
+    ranked_full = variances.sort_values(ascending=False).index.tolist()
+    ranked = ranked_full[:top_k]
+    if rank_size <= 0:
+        sliced = ranked[rank_start:]
+    else:
+        sliced = ranked[rank_start : rank_start + rank_size]
+    return list(sliced)
 
 
 def add_row_stats(df_extra: pl.DataFrame, extra_cols: Sequence[str]) -> pl.DataFrame:

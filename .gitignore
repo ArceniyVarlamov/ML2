@@ -11,6 +11,7 @@ __pycache__/
 .eggs/
 dist/
 build/
+Data/
 
 # Catboost training logs (тяжёлые и генерируемые)
 catboost_info/
