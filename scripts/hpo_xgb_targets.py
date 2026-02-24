@@ -231,7 +231,14 @@ def fit_xgb_fold_val_only(
     fit_kwargs: Dict[str, Any] = {"eval_set": [(x_val, y_val)], "verbose": False}
     if early_stopping_rounds > 0:
         fit_kwargs["early_stopping_rounds"] = early_stopping_rounds
-    model.fit(x_train, y_train, **fit_kwargs)
+    try:
+        model.fit(x_train, y_train, **fit_kwargs)
+    except TypeError as e:
+        if "early_stopping_rounds" in str(e):
+            fit_kwargs.pop("early_stopping_rounds", None)
+            model.fit(x_train, y_train, **fit_kwargs)
+        else:
+            raise
     return model.predict_proba(x_val)[:, 1].astype(np.float32)
 
 

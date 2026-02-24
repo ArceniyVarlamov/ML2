@@ -157,6 +157,13 @@ def _fit_xgb_with_fallback(
         model.fit(x_train, y_train, **fit_kwargs)
     except Exception as exc:
         err = str(exc).lower()
+        if "unexpected keyword argument 'early_stopping_rounds'" in err:
+            fit_kwargs.pop("early_stopping_rounds", None)
+            model = XGBClassifier(**p)
+            model.fit(x_train, y_train, **fit_kwargs)
+            val_pred = model.predict_proba(x_val)[:, 1].astype(np.float32)
+            test_pred = model.predict_proba(x_test)[:, 1].astype(np.float32)
+            return val_pred, test_pred
         if ("cuda" in err or "gpu" in err) and (p.get("device") == "cuda" or p.get("tree_method") in {"gpu_hist"}):
             cpu_p = dict(p)
             cpu_p.pop("device", None)

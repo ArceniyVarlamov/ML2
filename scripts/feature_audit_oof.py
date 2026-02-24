@@ -139,7 +139,14 @@ def fit_xgb_model(x_train: pd.DataFrame, y_train: np.ndarray, x_val: pd.DataFram
     fit_kwargs: Dict[str, Any] = {"eval_set": [(x_val, y_val)], "verbose": False}
     if early_stopping_rounds > 0:
         fit_kwargs["early_stopping_rounds"] = early_stopping_rounds
-    m.fit(x_train, y_train, **fit_kwargs)
+    try:
+        m.fit(x_train, y_train, **fit_kwargs)
+    except TypeError as e:
+        if "early_stopping_rounds" in str(e):
+            fit_kwargs.pop("early_stopping_rounds", None)
+            m.fit(x_train, y_train, **fit_kwargs)
+        else:
+            raise
     return m
 
 

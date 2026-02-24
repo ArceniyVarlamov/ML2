@@ -1028,7 +1028,16 @@ def fit_predict_one_fold(
         fit_kwargs: Dict[str, Any] = {"eval_set": [(x_val, y_val)], "verbose": False}
         if early_stopping_rounds > 0:
             fit_kwargs["early_stopping_rounds"] = early_stopping_rounds
-        model.fit(x_train, y_train, **fit_kwargs)
+        try:
+            model.fit(x_train, y_train, **fit_kwargs)
+        except TypeError as e:
+            # xgboost sklearn API changed in some versions and no longer accepts
+            # early_stopping_rounds in fit(); retry without it to stay compatible.
+            if "early_stopping_rounds" in str(e):
+                fit_kwargs.pop("early_stopping_rounds", None)
+                model.fit(x_train, y_train, **fit_kwargs)
+            else:
+                raise
         val_pred = model.predict_proba(x_val)[:, 1].astype(np.float32)
         test_pred = model.predict_proba(x_test)[:, 1].astype(np.float32)
         return val_pred, test_pred
