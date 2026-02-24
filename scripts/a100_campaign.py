@@ -49,6 +49,8 @@ def run_task(task: Dict[str, Any], cwd: Path, env_extra: Dict[str, str], log_dir
     task_env.update({str(k): str(v) for k, v in task.get("env", {}).items()})
     env = os.environ.copy()
     env.update(task_env)
+    # Default to unbuffered Python logs so long-running tasks show progress in tail -f.
+    env.setdefault("PYTHONUNBUFFERED", "1")
 
     ensure_dir(log_dir)
     out_log = log_dir / f"{task_id}.out.log"
@@ -61,6 +63,8 @@ def run_task(task: Dict[str, Any], cwd: Path, env_extra: Dict[str, str], log_dir
     with out_log.open("ab") as fout, err_log.open("ab") as ferr:
         fout.write(f"\n=== {now_ts()} START {task_id} ===\n".encode())
         ferr.write(f"\n=== {now_ts()} START {task_id} ===\n".encode())
+        fout.flush()
+        ferr.flush()
         proc = subprocess.run(
             cmd if shell else shlex.split(cmd),
             cwd=str(cwd),
@@ -72,6 +76,8 @@ def run_task(task: Dict[str, Any], cwd: Path, env_extra: Dict[str, str], log_dir
         )
         fout.write(f"\n=== {now_ts()} END {task_id} rc={proc.returncode} ===\n".encode())
         ferr.write(f"\n=== {now_ts()} END {task_id} rc={proc.returncode} ===\n".encode())
+        fout.flush()
+        ferr.flush()
     return int(proc.returncode)
 
 
@@ -91,6 +97,8 @@ def main() -> None:
     log_dir = (cwd / spec.get("log_dir", f"artifacts_campaigns/{campaign_path.stem}")).resolve()
     state_path = log_dir / "state.json"
     state = load_state(state_path)
+    state.setdefault("campaign", {"name": spec.get("name", campaign_path.stem), "cwd": str(cwd)})
+    save_state(state_path, state)
 
     tasks: List[Dict[str, Any]] = list(spec.get("tasks", []))
     if not tasks:
@@ -130,6 +138,12 @@ def main() -> None:
             save_state(state_path, state)
             continue
 
+        state["tasks"][task_id] = {
+            "status": "running",
+            "ts_utc": now_ts(),
+            "done_if_all_exist": done_paths,
+        }
+        save_state(state_path, state)
         rc = run_task(task, cwd=cwd, env_extra=env_extra, log_dir=log_dir, dry_run=bool(args.dry_run))
         rec = {
             "task_id": task_id,

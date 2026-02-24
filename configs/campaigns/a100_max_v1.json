@@ -11,11 +11,7 @@
   "tasks": [
     {
       "id": "preflight",
-      "cmd": "bash scripts/a100_preflight.sh",
-      "done_if_all_exist": [
-        "configs/top1_a100_h9_full_xgb_v1.json",
-        "configs/top1_a100_h6_targetaware_strong_gpu_v1.json"
-      ]
+      "cmd": "bash scripts/a100_preflight.sh"
     },
     {
       "id": "h9_write_meta",
