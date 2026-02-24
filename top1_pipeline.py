@@ -1089,8 +1089,8 @@ def fit_predict_one_fold(
                 )
             else:
                 raise
-        val_pred = xgb_predict_proba_binary(model, x_val)
-        test_pred = xgb_predict_proba_binary(model, x_test)
+        val_pred = model.predict_proba(x_val)[:, 1].astype(np.float32)
+        test_pred = model.predict_proba(x_test)[:, 1].astype(np.float32)
         return val_pred, test_pred
 
     if model_name == "lightgbm":
@@ -1107,8 +1107,8 @@ def fit_predict_one_fold(
             categorical_feature=[c for c in cat_cols if c in x_train.columns],
             callbacks=[lgb.early_stopping(stopping_rounds=early_stopping_rounds, verbose=False)],
         )
-        val_pred = model.predict_proba(x_val)[:, 1].astype(np.float32)
-        test_pred = model.predict_proba(x_test)[:, 1].astype(np.float32)
+        val_pred = xgb_predict_proba_binary(model, x_val)
+        test_pred = xgb_predict_proba_binary(model, x_test)
         return val_pred, test_pred
 
     if model_name == "xgboost":
