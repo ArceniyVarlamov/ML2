@@ -184,6 +184,17 @@ Rule: **do not delete old ideas**. Change status + add evidence instead.
 - Decision:
   - Default mode for top-level ensemble
 
+### `top3_weighted` (per-target top-3 sources, fixed weights)
+
+- Status: `INFRA_READY`
+- Role:
+  - Broader fixed-weight routing without SLSQP overfit risk
+- Implementation:
+  - `cross_hypothesis_ensemble.py --mode top3_weighted`
+  - configurable `--top3-weights` (default normalized `0.45/0.35/0.20`)
+- Decision:
+  - High-priority no-train mode to test as source library grows (especially after H8 and A100 sources)
+
 ### `optimize_weights` (SLSQP + L2 regularization)
 
 - Status: `NEG_IN_CORE` (current H4-core) / `CONDITIONAL+` infra-wise
@@ -341,6 +352,16 @@ These are not “one true feature selection”, but separate source-generating b
   - Full-power XGB source without fast-mode top-k constraints
 - Priority:
   - Highest A100 training priority
+
+### H4_DART / H_DART (LGBM/XGB DART diversity source)
+
+- Status: `INFRA_READY`
+- Goal:
+  - Add lower-correlation DART predictions as a new source family
+- Config:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/top1_a100_h4_dart_xgb_lgb_v1.json`
+- Decision:
+  - High-priority A100 diversity branch (cheap compared to MTL/AutoML)
 
 ### H_LAMA (LightAutoML source)
 
@@ -550,6 +571,10 @@ Recommended rule:
   - `/Users/arceniy/Documents/Projects/Data ML Hack 2/cross_hypothesis_ensemble.py`
 - Target group generator for H8:
   - `/Users/arceniy/Documents/Projects/Data ML Hack 2/build_target_groups.py`
+- A100 campaign runner:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/a100_campaign.py`
+- A100 runbook:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/docs/A100_READINESS_RUNBOOK.md`
 
 ## N. Imported Ideas Backlog (from `/Users/arceniy/Downloads/ML_Гипотезы_План.md`)
 

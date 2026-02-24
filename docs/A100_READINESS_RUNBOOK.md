@@ -35,6 +35,29 @@ bash scripts/a100_preflight.sh
 
 ## Priority Queue (A100)
 
+### Fastest way to start (resumable queue)
+
+If you have a short/unstable A100 window, use the campaign runner:
+
+```bash
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_max_v1.json
+```
+
+Useful flags:
+
+```bash
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_max_v1.json --dry-run
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_max_v1.json --from-task h9_run_bases_xgb
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_max_v1.json --only h9_run_bases_xgb,h9_blend
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_max_v1.json --force
+```
+
+Campaign state/logs:
+
+- `artifacts_campaigns/a100_max_v1/state.json`
+- `artifacts_campaigns/a100_max_v1/*.out.log`
+- `artifacts_campaigns/a100_max_v1/*.err.log`
+
 ### Priority 1 — `H9_full_xgb` (full/near-full extra features)
 
 Config:
@@ -127,6 +150,30 @@ Example: add `H6_strong_blend`:
 1. Run only `H9_full_xgb run-bases --models xgboost`
 2. Copy `base/xgboost_oof.parquet` and `base/xgboost_test.parquet` first
 3. Blend/stack can be done later or skipped (xgboost source is enough for first integration)
+
+## Top-level ensemble modes after A100 sources arrive
+
+Default remains `top2_weighted` (best Public LB so far), but now the ensemble supports:
+
+- `top3_weighted` with fixed weights (default normalized to `0.45/0.35/0.20`)
+
+Example:
+
+```bash
+./.venv/bin/python cross_hypothesis_ensemble.py \
+  --train-target Data/Main/train_target.parquet \
+  --sample-submit Data/Main/sample_submit.parquet \
+  --source-manifest configs/manifests/champion_current_best_sources.json \
+  --source H9_xgb:artifacts_a100_h9_full_xgb_v1/base/xgboost_oof.parquet:artifacts_a100_h9_full_xgb_v1/base/xgboost_test.parquet \
+  --allow-partial-sources \
+  --mode top3_weighted \
+  --top3-weights 0.45,0.35,0.20 \
+  --check-duplicates \
+  --max-sources-per-target 8 \
+  --min-delta-auc 0.01 \
+  --out-parquet artifacts_cross_hyp/submissions/sub_CHAMP_plus_H9xgb_top3w.parquet \
+  --out-report artifacts_cross_hyp/reports/CHAMP_plus_H9xgb_top3w.json
+```
 
 ## What not to do when A100 opens
 

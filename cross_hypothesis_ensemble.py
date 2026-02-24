@@ -79,6 +79,19 @@ def parse_sources_manifest(path: Path) -> List[Dict[str, str]]:
     return out
 
 
+def parse_fixed_weights(spec: str, expected_n: int, name: str) -> List[float]:
+    parts = [p.strip() for p in str(spec).split(",") if p.strip()]
+    if len(parts) != expected_n:
+        raise ValueError(f"{name} must contain exactly {expected_n} comma-separated weights")
+    vals = [float(x) for x in parts]
+    if any(v < 0 for v in vals):
+        raise ValueError(f"{name} weights must be non-negative")
+    s = float(sum(vals))
+    if s <= 0:
+        raise ValueError(f"{name} weights sum must be > 0")
+    return [v / s for v in vals]
+
+
 def sha256_file(path: Path, chunk_size: int = 1 << 20) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -259,13 +272,24 @@ def main() -> None:
     )
     p.add_argument(
         "--mode",
-        choices=["winner", "top2_weighted", "optimize_weights"],
+        choices=["winner", "top2_weighted", "top3_weighted", "optimize_weights"],
         default="winner",
         help=(
             "winner: choose best source per target; "
             "top2_weighted: weighted average of top-2 by OOF AUC; "
+            "top3_weighted: weighted average of top-3 by OOF AUC; "
             "optimize_weights: SLSQP with L2 regularization"
         ),
+    )
+    p.add_argument(
+        "--top2-weights",
+        default="0.65,0.35",
+        help="Fixed weights for top2_weighted (comma-separated, normalized internally).",
+    )
+    p.add_argument(
+        "--top3-weights",
+        default="0.45,0.35,0.20",
+        help="Fixed weights for top3_weighted (comma-separated, normalized internally).",
     )
     p.add_argument(
         "--opt-alpha",
@@ -383,6 +407,8 @@ def main() -> None:
             "min_delta_auc": float(args.min_delta_auc),
             "check_duplicates": bool(args.check_duplicates),
             "allow_partial_sources": bool(args.allow_partial_sources),
+            "top2_weights": [float(x) for x in parse_fixed_weights(args.top2_weights, 2, "--top2-weights")],
+            "top3_weights": [float(x) for x in parse_fixed_weights(args.top3_weights, 3, "--top3-weights")],
         },
         "opt_params": {
             "alpha": float(args.opt_alpha),
@@ -407,6 +433,8 @@ def main() -> None:
         }
         for s in sources
     }
+    top2_weights = parse_fixed_weights(args.top2_weights, 2, "--top2-weights")
+    top3_weights = parse_fixed_weights(args.top3_weights, 3, "--top3-weights")
 
     for target in target_cols:
         y = train_target[target].to_numpy(dtype=np.int8, copy=False)
@@ -453,15 +481,22 @@ def main() -> None:
             for src_item in candidate_pool[1:]:
                 if (best_auc - float(src_item["auc"])) <= float(args.min_delta_auc):
                     filtered.append(src_item)
-            # Preserve minimum width for top2 mode if available.
-            if args.mode == "top2_weighted" and len(filtered) < min(2, len(candidate_pool)):
-                filtered = list(candidate_pool[: min(2, len(candidate_pool))])
+            # Preserve minimum width for fixed-top-k modes if available.
+            min_keep = 1
+            if args.mode == "top2_weighted":
+                min_keep = min(2, len(candidate_pool))
+            elif args.mode == "top3_weighted":
+                min_keep = min(3, len(candidate_pool))
+            if len(filtered) < min_keep:
+                filtered = list(candidate_pool[:min_keep])
             candidate_pool = filtered
 
         if int(args.max_sources_per_target) > 0 and len(candidate_pool) > int(args.max_sources_per_target):
             max_n = int(args.max_sources_per_target)
             if args.mode == "top2_weighted":
                 max_n = max(max_n, min(2, len(candidate_pool)))
+            elif args.mode == "top3_weighted":
+                max_n = max(max_n, min(3, len(candidate_pool)))
             candidate_pool = candidate_pool[:max_n]
 
         for src_item in candidate_pool:
@@ -482,7 +517,7 @@ def main() -> None:
                     "sources": [{"label": top[0]["label"], "weight": 1.0}],
                 }
             else:
-                w1, w2 = 0.65, 0.35
+                w1, w2 = top2_weights
                 oof_final = w1 * top[0]["oof_pred"] + w2 * top[1]["oof_pred"]
                 test_final = w1 * top[0]["test_pred"] + w2 * top[1]["test_pred"]
                 chosen = {
@@ -490,6 +525,46 @@ def main() -> None:
                     "sources": [
                         {"label": top[0]["label"], "weight": w1},
                         {"label": top[1]["label"], "weight": w2},
+                    ],
+                }
+        elif args.mode == "top3_weighted":
+            top = candidate_pool[:3]
+            if len(top) == 1:
+                oof_final = top[0]["oof_pred"]
+                test_final = top[0]["test_pred"]
+                chosen = {
+                    "strategy": "top3_weighted",
+                    "sources": [{"label": top[0]["label"], "weight": 1.0}],
+                }
+            elif len(top) == 2:
+                w = np.asarray(top2_weights, dtype=np.float64)
+                oof_final = w[0] * top[0]["oof_pred"] + w[1] * top[1]["oof_pred"]
+                test_final = w[0] * top[0]["test_pred"] + w[1] * top[1]["test_pred"]
+                chosen = {
+                    "strategy": "top3_weighted",
+                    "sources": [
+                        {"label": top[0]["label"], "weight": float(w[0])},
+                        {"label": top[1]["label"], "weight": float(w[1])},
+                    ],
+                }
+            else:
+                w = np.asarray(top3_weights, dtype=np.float64)
+                oof_final = (
+                    w[0] * top[0]["oof_pred"]
+                    + w[1] * top[1]["oof_pred"]
+                    + w[2] * top[2]["oof_pred"]
+                )
+                test_final = (
+                    w[0] * top[0]["test_pred"]
+                    + w[1] * top[1]["test_pred"]
+                    + w[2] * top[2]["test_pred"]
+                )
+                chosen = {
+                    "strategy": "top3_weighted",
+                    "sources": [
+                        {"label": top[0]["label"], "weight": float(w[0])},
+                        {"label": top[1]["label"], "weight": float(w[1])},
+                        {"label": top[2]["label"], "weight": float(w[2])},
                     ],
                 }
         else:
