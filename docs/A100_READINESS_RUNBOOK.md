@@ -1,6 +1,6 @@
-# A100 Readiness Runbook (Immediate Start)
+# A100 Readiness Runbook (Quality-First, Resumable)
 
-This file is for the moment A100 becomes available. The goal is to start useful work in minutes, not to design experiments on the fly.
+This file is for the moment A100 becomes available. The goal is to run a prepared, high-quality campaign without improvisation, while still being able to use short windows efficiently.
 
 ## Principles
 
@@ -35,7 +35,7 @@ bash scripts/a100_preflight.sh
 
 ## Priority Queue (A100)
 
-### Fastest way to start (resumable queue)
+### Prepared campaign (resumable queue)
 
 If you have a short/unstable A100 window, use the campaign runner:
 
@@ -57,6 +57,39 @@ Campaign state/logs:
 - `artifacts_campaigns/a100_max_v1/state.json`
 - `artifacts_campaigns/a100_max_v1/*.out.log`
 - `artifacts_campaigns/a100_max_v1/*.err.log`
+
+### HPO campaign (quality-first specialists/full41, resumable)
+
+This is the prepared XGBoost HPO framework. It supports `rare/hard` pilot scope and `all41` using the same runner and artifact format.
+
+Quick status check (safe, no training):
+
+```bash
+./.venv/bin/python scripts/hpo_xgb_targets.py --config configs/hpo/xgb_targets_rarehard_v1.json status
+./.venv/bin/python scripts/hpo_xgb_targets.py --config configs/hpo/xgb_targets_all41_v1.json status
+```
+
+Run the HPO campaign queue:
+
+```bash
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_hpo_xgb_targets_v1.json
+```
+
+Useful staged runs:
+
+```bash
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_hpo_xgb_targets_v1.json --only hpo_rarehard_search
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_hpo_xgb_targets_v1.json --only hpo_rarehard_train_source
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_hpo_xgb_targets_v1.json --from-task hpo_all41_search
+```
+
+Key outputs (rarehard pilot):
+
+- `artifacts_hpo_xgb_targets_rarehard_v1/state.json`
+- `artifacts_hpo_xgb_targets_rarehard_v1/best_params_by_target.json`
+- `configs/generated/top1_h8_hpo_xgb_rarehard_v1_tuned.json`
+- `artifacts_h8_hpo_xgb_rarehard_v1/base/xgboost_oof.parquet`
+- `artifacts_h8_hpo_xgb_rarehard_v1/ensemble/blend_oof.parquet`
 
 ### Priority 1 — `H9_full_xgb` (full/near-full extra features)
 
@@ -145,6 +178,23 @@ Example: add `H6_strong_blend`:
   --experiment-log artifacts_cross_hyp/reports/experiment_log.jsonl
 ```
 
+Example: add tuned HPO XGBoost specialists source (partial `rare/hard`):
+
+```bash
+./.venv/bin/python cross_hypothesis_ensemble.py \
+  --train-target Data/Main/train_target.parquet \
+  --sample-submit Data/Main/sample_submit.parquet \
+  --source-manifest configs/manifests/champion_current_best_sources.json \
+  --source H8hpo_xgb_rarehard_blend:artifacts_h8_hpo_xgb_rarehard_v1/ensemble/blend_oof.parquet:artifacts_h8_hpo_xgb_rarehard_v1/ensemble/blend_test.parquet \
+  --allow-partial-sources \
+  --mode top2_weighted \
+  --check-duplicates \
+  --max-sources-per-target 10 \
+  --min-delta-auc 0.01 \
+  --out-parquet artifacts_cross_hyp/submissions/sub_CHAMP_plus_H8hpoXgbRareHard_top2w.parquet \
+  --out-report artifacts_cross_hyp/reports/CHAMP_plus_H8hpoXgbRareHard_top2w.json
+```
+
 ## If A100 window is short (triage mode)
 
 1. Run only `H9_full_xgb run-bases --models xgboost`
@@ -180,6 +230,7 @@ Example:
 1. Do not spend the first hour tuning `optimize_weights`.
 2. Do not rerun already-closed no-train source expansions (`H4_cat/H4_lgb`, `H3_cat/H3_lgb`) in current `top2w` core.
 3. Do not start with pseudo-labeling.
+4. Do not run manual ad-hoc HPO loops if `scripts/hpo_xgb_targets.py` + campaign spec already cover the same scope.
 
 ## Notes on H2O/AutoML/GLM
 

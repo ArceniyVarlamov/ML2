@@ -1,0 +1,60 @@
+{
+  "name": "xgb_targets_rarehard_v1",
+  "seed": 42,
+  "base_pipeline_config": "configs/top1_fast_h4_xgb_gpu4050.json",
+  "output_dir": "artifacts_hpo_xgb_targets_rarehard_v1",
+  "target_scope": {
+    "target_groups_file": "configs/targets/groups_h8.json",
+    "groups": ["rare", "hard"]
+  },
+  "pipeline_overrides": {
+    "output_dir": "artifacts_hpo_xgb_targets_rarehard_v1/unused",
+    "models": {
+      "catboost": { "enabled": false },
+      "lightgbm": { "enabled": false },
+      "xgboost": {
+        "enabled": true,
+        "params": {
+          "device": "cuda",
+          "tree_method": "hist",
+          "eval_metric": "auc"
+        }
+      }
+    },
+    "tracking": {
+      "experiment_log": "artifacts_hpo_xgb_targets_rarehard_v1/search_pipeline_experiment_log.jsonl"
+    }
+  },
+  "search": {
+    "seed": 42,
+    "trials_per_target": 24,
+    "max_trials_total": 0,
+    "max_seconds_total": 0,
+    "max_seconds_per_target": 0,
+    "max_targets": 0,
+    "sample_train_rows_per_fold": 0,
+    "sample_val_rows_per_fold": 0,
+    "force_cpu_for_search": false
+  },
+  "space": {
+    "learning_rate": { "type": "float", "low": 0.02, "high": 0.08, "log": true, "round": 5 },
+    "max_depth": { "type": "int", "low": 5, "high": 10 },
+    "min_child_weight": { "type": "float", "low": 1.0, "high": 8.0, "log": true, "round": 4 },
+    "subsample": { "type": "float", "low": 0.65, "high": 0.95, "round": 4 },
+    "colsample_bytree": { "type": "float", "low": 0.65, "high": 0.95, "round": 4 },
+    "reg_alpha": { "type": "float", "low": 0.0001, "high": 1.0, "log": true, "round": 6 },
+    "reg_lambda": { "type": "float", "low": 0.5, "high": 6.0, "log": true, "round": 6 },
+    "gamma": { "type": "float", "low": 0.0, "high": 3.0, "round": 4 },
+    "n_estimators": { "type": "int", "low": 800, "high": 2400, "step": 100 },
+    "early_stopping_rounds": { "type": "int", "low": 50, "high": 140, "step": 10 }
+  },
+  "train_source": {
+    "output_dir": "artifacts_h8_hpo_xgb_rarehard_v1",
+    "models": ["xgboost"],
+    "run_blend": true,
+    "run_stack": false,
+    "emit_submission": false,
+    "fallback_source": "artifacts_cross_hyp/submissions/sub_CHAMP_plus_H8rare_blend_H8hard_blend_top2w.parquet",
+    "tuned_config_path": "configs/generated/top1_h8_hpo_xgb_rarehard_v1_tuned.json"
+  }
+}

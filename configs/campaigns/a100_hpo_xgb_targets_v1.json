@@ -1,0 +1,47 @@
+{
+  "name": "a100_hpo_xgb_targets_v1",
+  "description": "Quality-first XGBoost HPO campaign (rarehard pilot + full41 follow-up), resumable.",
+  "workdir": "../..",
+  "log_dir": "artifacts_campaigns/a100_hpo_xgb_targets_v1",
+  "env": {
+    "OMP_NUM_THREADS": "8",
+    "MKL_NUM_THREADS": "8",
+    "NUMEXPR_NUM_THREADS": "8"
+  },
+  "tasks": [
+    {
+      "id": "hpo_rarehard_search",
+      "cmd": "./.venv/bin/python scripts/hpo_xgb_targets.py --config configs/hpo/xgb_targets_rarehard_v1.json search",
+      "done_if_all_exist": [
+        "artifacts_hpo_xgb_targets_rarehard_v1/best_params_by_target.json",
+        "artifacts_hpo_xgb_targets_rarehard_v1/summary.json"
+      ]
+    },
+    {
+      "id": "hpo_rarehard_train_source",
+      "cmd": "./.venv/bin/python scripts/hpo_xgb_targets.py --config configs/hpo/xgb_targets_rarehard_v1.json train-source",
+      "done_if_all_exist": [
+        "artifacts_h8_hpo_xgb_rarehard_v1/base/xgboost_oof.parquet",
+        "artifacts_h8_hpo_xgb_rarehard_v1/ensemble/blend_oof.parquet",
+        "artifacts_h8_hpo_xgb_rarehard_v1/scores/blend_scores.json"
+      ]
+    },
+    {
+      "id": "hpo_all41_search",
+      "cmd": "./.venv/bin/python scripts/hpo_xgb_targets.py --config configs/hpo/xgb_targets_all41_v1.json search",
+      "done_if_all_exist": [
+        "artifacts_hpo_xgb_targets_all41_v1/best_params_by_target.json",
+        "artifacts_hpo_xgb_targets_all41_v1/summary.json"
+      ]
+    },
+    {
+      "id": "hpo_all41_train_source",
+      "cmd": "./.venv/bin/python scripts/hpo_xgb_targets.py --config configs/hpo/xgb_targets_all41_v1.json train-source",
+      "done_if_all_exist": [
+        "artifacts_h4_hpo_xgb_all41_v1/base/xgboost_oof.parquet",
+        "artifacts_h4_hpo_xgb_all41_v1/ensemble/blend_oof.parquet",
+        "artifacts_h4_hpo_xgb_all41_v1/scores/blend_scores.json"
+      ]
+    }
+  ]
+}

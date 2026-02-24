@@ -1,6 +1,6 @@
 # Hypotheses & Strategy Registry (Living Document)
 
-Last updated: `2026-02-23` (manual sync from experiment history, repo state, and imported idea list)
+Last updated: `2026-02-24` (includes H8 specialist LB gains, A100 readiness package, and XGBoost HPO framework infra)
 
 ## Purpose
 
@@ -347,7 +347,7 @@ These are not “one true feature selection”, but separate source-generating b
 
 ### H9_full_xgb (GPU full/near-full extra features)
 
-- Status: `PLANNED`
+- Status: `INFRA_READY`
 - Goal:
   - Full-power XGB source without fast-mode top-k constraints
 - Priority:
@@ -383,7 +383,7 @@ These are not “one true feature selection”, but separate source-generating b
 
 ### Strong H6 on A100/strong CPU
 
-- Status: `PLANNED`
+- Status: `INFRA_READY`
 - Goal:
   - Re-run target-aware MI selection with stronger limits than `ultrasafe`
 
@@ -391,18 +391,27 @@ These are not “one true feature selection”, but separate source-generating b
 
 ### Full per-target HPO on all 41 targets
 
-- Status: `FROZEN` (for now)
-- Reason:
-  - Too expensive vs likely ROI right now
-  - Current bigger gains come from source expansion and specialists
+- Status: `INFRA_READY` (framework) / `PLANNED` (execution)
+- Goal:
+  - Use the same XGBoost HPO framework as specialists, but with `scope=all41`
+- Current infra:
+  - `scripts/hpo_xgb_targets.py`
+  - `configs/hpo/xgb_targets_all41_v1.json`
+  - `configs/campaigns/a100_hpo_xgb_targets_v1.json`
+- Decision:
+  - Execute after/alongside `H9_full_xgb` when A100 window is stable enough for long campaigns
 
 ### Narrow HPO for specialists (`rare/hard`)
 
-- Status: `PLANNED`
+- Status: `INFRA_READY`
 - Goal:
   - Tune only selected targets and only selected models (`xgboost`, `catboost` first)
+- Current infra:
+  - `scripts/hpo_xgb_targets.py` (resumable search + export tuned config + source training)
+  - `configs/hpo/xgb_targets_rarehard_v1.json`
+  - `configs/campaigns/a100_hpo_xgb_targets_v1.json`
 - Decision:
-  - Allowed after H8 baseline specialists are in place
+  - First HPO execution target once A100 window is stable (after or alongside `H9_full_xgb`)
 
 ## H. EDA / Analytics Ideas (Only Those Tied to Score)
 
@@ -573,6 +582,13 @@ Recommended rule:
   - `/Users/arceniy/Documents/Projects/Data ML Hack 2/build_target_groups.py`
 - A100 campaign runner:
   - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/a100_campaign.py`
+- XGBoost HPO framework (resumable; rare/hard + all41 scopes):
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/hpo_xgb_targets.py`
+- XGBoost HPO configs:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/hpo/xgb_targets_rarehard_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/hpo/xgb_targets_all41_v1.json`
+- XGBoost HPO campaign spec:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_hpo_xgb_targets_v1.json`
 - A100 runbook:
   - `/Users/arceniy/Documents/Projects/Data ML Hack 2/docs/A100_READINESS_RUNBOOK.md`
 
@@ -611,7 +627,7 @@ These are explicitly captured so they do not get lost. Some overlap with existin
 
 ### H_DART (LGBM/XGB DART sources)
 
-- Status: `PLANNED`
+- Status: `INFRA_READY`
 - Rationale:
   - Likely lower solo score but potentially strong diversity source for top-level ensemble
 - Current priority:
@@ -627,7 +643,7 @@ These are explicitly captured so they do not get lost. Some overlap with existin
 
 ### Top-3 Weighted (fixed-weight top-3 per target)
 
-- Status: `PLANNED`
+- Status: `INFRA_READY`
 - Rationale:
   - Middle ground between robust `top2_weighted` and overfitting-prone `optimize_weights`
 - Current priority:
