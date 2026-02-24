@@ -179,7 +179,7 @@ def permutation_delta_for_feature(model: Any, x_val: pd.DataFrame, y_val: np.nda
     vals = x_perm[feature].to_numpy(copy=True)
     rng.shuffle(vals)
     x_perm[feature] = vals
-    pred = model.predict_proba(x_perm)[:, 1].astype(np.float32)
+    pred = p1.xgb_predict_proba_binary(model, x_perm)
     auc_perm = auc_safe(y_val, pred)
     if math.isnan(auc_perm):
         return float("nan")
@@ -252,7 +252,7 @@ def collect_real_folds(
         y_val = y[idx_val]
 
         model = fit_xgb_model(x_train, y_train, x_val, y_val, xgb_params)
-        pred = model.predict_proba(x_val)[:, 1].astype(np.float32)
+        pred = p1.xgb_predict_proba_binary(model, x_val)
         auc = auc_safe(y_val, pred)
         fold_aucs.append(float(auc))
         importances = getattr(model, "feature_importances_", None)
@@ -307,7 +307,7 @@ def collect_null_deltas(
             if int(y_train.sum()) == 0 or int(y_train.sum()) == len(y_train) or int(y_val.sum()) in (0, len(y_val)):
                 continue
             model = fit_xgb_model(x_train, y_train, x_val, y_val, xgb_params)
-            pred = model.predict_proba(x_val)[:, 1].astype(np.float32)
+            pred = p1.xgb_predict_proba_binary(model, x_val)
             baseline_auc = auc_safe(y_val, pred)
             for fi, feat in enumerate(features_to_perm):
                 d = permutation_delta_for_feature(

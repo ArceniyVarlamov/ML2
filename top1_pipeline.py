@@ -45,6 +45,98 @@ def rank_normalize(x: np.ndarray) -> np.ndarray:
     return ranks
 
 
+_CUPY_IMPORT_CACHE: Any = None
+_CUPY_IMPORT_ATTEMPTED = False
+
+
+def _to_numpy_float32(x: Any) -> np.ndarray:
+    if isinstance(x, (pd.DataFrame, pd.Series)):
+        arr = x.to_numpy(copy=False)
+    else:
+        arr = np.asarray(x)
+    if arr.dtype != np.float32:
+        arr = arr.astype(np.float32, copy=False)
+    return arr
+
+
+def _maybe_import_cupy() -> Any:
+    global _CUPY_IMPORT_CACHE, _CUPY_IMPORT_ATTEMPTED
+    if _CUPY_IMPORT_ATTEMPTED:
+        return _CUPY_IMPORT_CACHE
+    _CUPY_IMPORT_ATTEMPTED = True
+    try:
+        import cupy as cp  # type: ignore
+
+        _CUPY_IMPORT_CACHE = cp
+    except Exception:
+        _CUPY_IMPORT_CACHE = None
+    return _CUPY_IMPORT_CACHE
+
+
+def xgb_predict_proba_binary(model: Any, x: Any) -> np.ndarray:
+    """
+    GPU-friendly prediction path for XGBoost binary models.
+
+    The sklearn wrapper can fall back to DMatrix prediction when booster device and input
+    device differ (e.g., cuda booster + CPU DataFrame), which is slower and noisy on logs.
+    We try Booster.inplace_predict first and optionally move inputs to CuPy when available.
+    """
+    try:
+        booster = model.get_booster()
+    except Exception:
+        booster = None
+
+    if booster is not None and hasattr(booster, "inplace_predict"):
+        x_np = _to_numpy_float32(x)
+        x_in: Any = x_np
+        try:
+            xgb_params = model.get_xgb_params() if hasattr(model, "get_xgb_params") else {}
+        except Exception:
+            xgb_params = {}
+        dev = str(xgb_params.get("device", "")).lower()
+        tree_method = str(xgb_params.get("tree_method", "")).lower()
+        use_cuda = ("cuda" in dev) or (tree_method == "gpu_hist")
+        cp = _maybe_import_cupy() if use_cuda else None
+        if cp is not None:
+            try:
+                x_in = cp.asarray(x_np)
+            except Exception:
+                x_in = x_np
+        iteration_range = (0, 0)
+        try:
+            best_iteration = getattr(model, "best_iteration", None)
+            if best_iteration is not None and int(best_iteration) >= 0:
+                iteration_range = (0, int(best_iteration) + 1)
+        except Exception:
+            iteration_range = (0, 0)
+        try:
+            pred = booster.inplace_predict(
+                x_in,
+                iteration_range=iteration_range,
+                predict_type="value",
+                validate_features=False,
+            )
+            if cp is not None and isinstance(pred, cp.ndarray):
+                pred = cp.asnumpy(pred)
+            pred_np = np.asarray(pred)
+            if pred_np.ndim == 2:
+                if pred_np.shape[1] == 1:
+                    pred_np = pred_np[:, 0]
+                elif pred_np.shape[1] >= 2:
+                    pred_np = pred_np[:, 1]
+            return pred_np.astype(np.float32, copy=False)
+        except Exception:
+            # Fallback to sklearn wrapper path if inplace_predict is unavailable for some
+            # model/runtime combination.
+            pass
+
+    pred = model.predict_proba(x)
+    pred_np = np.asarray(pred)
+    if pred_np.ndim == 2 and pred_np.shape[1] >= 2:
+        pred_np = pred_np[:, 1]
+    return pred_np.astype(np.float32, copy=False)
+
+
 def parse_int_list(value: Any) -> List[int]:
     if value is None:
         return []
@@ -997,8 +1089,8 @@ def fit_predict_one_fold(
                 )
             else:
                 raise
-        val_pred = model.predict_proba(x_val)[:, 1].astype(np.float32)
-        test_pred = model.predict_proba(x_test)[:, 1].astype(np.float32)
+        val_pred = xgb_predict_proba_binary(model, x_val)
+        test_pred = xgb_predict_proba_binary(model, x_test)
         return val_pred, test_pred
 
     if model_name == "lightgbm":

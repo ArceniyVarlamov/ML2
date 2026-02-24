@@ -239,7 +239,7 @@ def fit_xgb_fold_val_only(
             model.fit(x_train, y_train, **fit_kwargs)
         else:
             raise
-    return model.predict_proba(x_val)[:, 1].astype(np.float32)
+    return p1.xgb_predict_proba_binary(model, x_val)
 
 
 def evaluate_xgb_params_oof(

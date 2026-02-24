@@ -161,8 +161,8 @@ def _fit_xgb_with_fallback(
             fit_kwargs.pop("early_stopping_rounds", None)
             model = XGBClassifier(**p)
             model.fit(x_train, y_train, **fit_kwargs)
-            val_pred = model.predict_proba(x_val)[:, 1].astype(np.float32)
-            test_pred = model.predict_proba(x_test)[:, 1].astype(np.float32)
+            val_pred = p1.xgb_predict_proba_binary(model, x_val)
+            test_pred = p1.xgb_predict_proba_binary(model, x_test)
             return val_pred, test_pred
         if ("cuda" in err or "gpu" in err) and (p.get("device") == "cuda" or p.get("tree_method") in {"gpu_hist"}):
             cpu_p = dict(p)
@@ -172,8 +172,8 @@ def _fit_xgb_with_fallback(
             model.fit(x_train, y_train, **fit_kwargs)
         else:
             raise
-    val_pred = model.predict_proba(x_val)[:, 1].astype(np.float32)
-    test_pred = model.predict_proba(x_test)[:, 1].astype(np.float32)
+    val_pred = p1.xgb_predict_proba_binary(model, x_val)
+    test_pred = p1.xgb_predict_proba_binary(model, x_test)
     return val_pred, test_pred
 
 
