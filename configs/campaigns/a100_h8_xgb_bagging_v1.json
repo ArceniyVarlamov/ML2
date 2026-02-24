@@ -1,0 +1,65 @@
+{
+  "name": "a100_h8_xgb_bagging_v1",
+  "description": "H8 specialist XGBoost bagging (rare + hard), partial-source outputs.",
+  "workdir": "../..",
+  "log_dir": "artifacts_campaigns/a100_h8_xgb_bagging_v1",
+  "env": {
+    "OMP_NUM_THREADS": "8",
+    "MKL_NUM_THREADS": "8",
+    "NUMEXPR_NUM_THREADS": "8"
+  },
+  "tasks": [
+    {
+      "id": "h8_rare_bag_write_meta",
+      "cmd": "./.venv/bin/python scripts/h8_xgb_bagging.py --config configs/h8/top1_h8_rare_xgb_bagging_a100_v1.json write-meta",
+      "done_if_all_exist": [
+        "artifacts_h8_rare_xgb_bagging_a100_v1/meta/columns.json",
+        "artifacts_h8_rare_xgb_bagging_a100_v1/meta/fold_ids.npy"
+      ]
+    },
+    {
+      "id": "h8_rare_bag_run_bases",
+      "cmd": "./.venv/bin/python scripts/h8_xgb_bagging.py --config configs/h8/top1_h8_rare_xgb_bagging_a100_v1.json run-bases",
+      "done_if_all_exist": [
+        "artifacts_h8_rare_xgb_bagging_a100_v1/base/xgboost_oof.parquet",
+        "artifacts_h8_rare_xgb_bagging_a100_v1/base/xgboost_test.parquet",
+        "artifacts_h8_rare_xgb_bagging_a100_v1/scores/xgboost_scores.json"
+      ]
+    },
+    {
+      "id": "h8_rare_bag_blend",
+      "cmd": "./.venv/bin/python scripts/h8_xgb_bagging.py --config configs/h8/top1_h8_rare_xgb_bagging_a100_v1.json blend",
+      "done_if_all_exist": [
+        "artifacts_h8_rare_xgb_bagging_a100_v1/ensemble/blend_oof.parquet",
+        "artifacts_h8_rare_xgb_bagging_a100_v1/ensemble/blend_test.parquet",
+        "artifacts_h8_rare_xgb_bagging_a100_v1/scores/blend_scores.json"
+      ]
+    },
+    {
+      "id": "h8_hard_bag_write_meta",
+      "cmd": "./.venv/bin/python scripts/h8_xgb_bagging.py --config configs/h8/top1_h8_hard_xgb_bagging_a100_v1.json write-meta",
+      "done_if_all_exist": [
+        "artifacts_h8_hard_xgb_bagging_a100_v1/meta/columns.json",
+        "artifacts_h8_hard_xgb_bagging_a100_v1/meta/fold_ids.npy"
+      ]
+    },
+    {
+      "id": "h8_hard_bag_run_bases",
+      "cmd": "./.venv/bin/python scripts/h8_xgb_bagging.py --config configs/h8/top1_h8_hard_xgb_bagging_a100_v1.json run-bases",
+      "done_if_all_exist": [
+        "artifacts_h8_hard_xgb_bagging_a100_v1/base/xgboost_oof.parquet",
+        "artifacts_h8_hard_xgb_bagging_a100_v1/base/xgboost_test.parquet",
+        "artifacts_h8_hard_xgb_bagging_a100_v1/scores/xgboost_scores.json"
+      ]
+    },
+    {
+      "id": "h8_hard_bag_blend",
+      "cmd": "./.venv/bin/python scripts/h8_xgb_bagging.py --config configs/h8/top1_h8_hard_xgb_bagging_a100_v1.json blend",
+      "done_if_all_exist": [
+        "artifacts_h8_hard_xgb_bagging_a100_v1/ensemble/blend_oof.parquet",
+        "artifacts_h8_hard_xgb_bagging_a100_v1/ensemble/blend_test.parquet",
+        "artifacts_h8_hard_xgb_bagging_a100_v1/scores/blend_scores.json"
+      ]
+    }
+  ]
+}

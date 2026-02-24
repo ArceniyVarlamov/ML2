@@ -1,0 +1,42 @@
+{
+  "name": "feature_audit_xgb_rarehard_v1",
+  "seed": 42,
+  "base_pipeline_config": "configs/top1_a100_h9_full_xgb_v1.json",
+  "output_dir": "artifacts_feature_audit_xgb_rarehard_v1",
+  "target_scope": {
+    "target_groups_file": "configs/targets/groups_h8.json",
+    "groups": ["rare", "hard"]
+  },
+  "pipeline_overrides": {
+    "output_dir": "artifacts_feature_audit_xgb_rarehard_v1/unused",
+    "tracking": {
+      "experiment_log": "artifacts_feature_audit_xgb_rarehard_v1/prep_experiment_log.jsonl"
+    }
+  },
+  "audit": {
+    "seed": 42,
+    "candidate_mode": "selected_extra_plus_row_stats",
+    "candidate_hard_cap": 0,
+    "force_include_prefixes": ["num_feature"],
+    "exclude_prefixes": [],
+    "max_targets": 0,
+    "per_target_feature_limit": 64,
+    "null_trials": 3,
+    "use_target_feature_map": false,
+    "force_cpu": false,
+    "fold_eval": {
+      "seed": 42,
+      "sample_train_rows_per_fold": 220000,
+      "sample_val_rows_per_fold": 120000
+    },
+    "decision": {
+      "keep_min_targets": 2,
+      "keep_min_pos_rate": 0.6,
+      "keep_min_z": 1.5,
+      "keep_min_mean_delta": 0.0002,
+      "drop_min_targets": 2,
+      "drop_max_z": 0.2,
+      "drop_max_mean_delta": 0.0
+    }
+  }
+}

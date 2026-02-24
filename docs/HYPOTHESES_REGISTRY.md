@@ -306,11 +306,16 @@ These are not “one true feature selection”, but separate source-generating b
 
 ### Feature audit (OOF Permutation + Null Importance + stability)
 
-- Status: `PLANNED`
+- Status: `INFRA_READY`
 - Role:
   - Gold-standard-ish audit for “signal vs noise” (better than variance/MI alone)
+- Current infra:
+  - `scripts/feature_audit_oof.py` (resumable per-target OOF permutation + null importance)
+  - `configs/audit/feature_audit_xgb_rarehard_v1.json`
+  - `configs/audit/feature_audit_xgb_all41_v1.json`
+  - `configs/campaigns/a100_feature_audit_xgb_v1.json`
 - Decision:
-  - Medium priority; build once and use repeatedly for curated feature sets
+  - High priority A100 preparation layer (anti-noise); run before aggressive feature pruning decisions
 
 ## E. Target Specialists (H8) — Macro AUC Specialists
 
@@ -589,6 +594,18 @@ Recommended rule:
   - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/hpo/xgb_targets_all41_v1.json`
 - XGBoost HPO campaign spec:
   - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_hpo_xgb_targets_v1.json`
+- Feature audit pipeline (OOF permutation + null):
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/feature_audit_oof.py`
+- Feature audit configs/campaign:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/audit/feature_audit_xgb_rarehard_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/audit/feature_audit_xgb_all41_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_feature_audit_xgb_v1.json`
+- H8 XGB bagging specialists runner:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/h8_xgb_bagging.py`
+- H8 bagging configs/campaign:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/h8/top1_h8_rare_xgb_bagging_a100_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/h8/top1_h8_hard_xgb_bagging_a100_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_h8_xgb_bagging_v1.json`
 - A100 runbook:
   - `/Users/arceniy/Documents/Projects/Data ML Hack 2/docs/A100_READINESS_RUNBOOK.md`
 
@@ -617,13 +634,18 @@ These are explicitly captured so they do not get lost. Some overlap with existin
 
 ### H8_Rare_Bagging (undersampling bagging for rare targets)
 
-- Status: `PLANNED`
+- Status: `INFRA_READY`
 - Maps to:
   - `H8` family v2 (after baseline `H8_rare`/`H8_hard`)
 - Rationale:
   - Strong macro-AUC-specific idea; likely useful where class weighting alone is insufficient
+- Current infra:
+  - `scripts/h8_xgb_bagging.py` (partial-source, resumable target-level XGB bagging)
+  - `configs/h8/top1_h8_rare_xgb_bagging_a100_v1.json`
+  - `configs/h8/top1_h8_hard_xgb_bagging_a100_v1.json`
+  - `configs/campaigns/a100_h8_xgb_bagging_v1.json`
 - Risk:
-  - Higher training cost and orchestration complexity (many models per target)
+  - Higher training cost than standard H8 specialists; monitor stability and duplicate-source risk
 
 ### H_DART (LGBM/XGB DART sources)
 

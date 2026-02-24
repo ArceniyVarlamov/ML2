@@ -91,6 +91,38 @@ Key outputs (rarehard pilot):
 - `artifacts_h8_hpo_xgb_rarehard_v1/base/xgboost_oof.parquet`
 - `artifacts_h8_hpo_xgb_rarehard_v1/ensemble/blend_oof.parquet`
 
+### Feature-audit campaign (anti-noise layer, resumable)
+
+Run before aggressive feature pruning decisions and before building `FS_signal_only` / `FS_drift_pruned` from heuristics alone:
+
+```bash
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_feature_audit_xgb_v1.json
+```
+
+Outputs:
+
+- `artifacts_feature_audit_xgb_rarehard_v1/summary.json`
+- `artifacts_feature_audit_xgb_rarehard_v1/keep_extra.json`
+- `artifacts_feature_audit_xgb_rarehard_v1/drop_columns.json`
+- `artifacts_feature_audit_xgb_all41_v1/summary.json`
+- `artifacts_feature_audit_xgb_all41_v1/keep_extra.json`
+- `artifacts_feature_audit_xgb_all41_v1/drop_columns.json`
+
+### H8 XGBoost bagging campaign (specialists v2, partial sources)
+
+This is the first bagging-based specialist branch (`rare` + `hard`) using undersampling per bag.
+
+```bash
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_h8_xgb_bagging_v1.json
+```
+
+Key outputs:
+
+- `artifacts_h8_rare_xgb_bagging_a100_v1/ensemble/blend_oof.parquet`
+- `artifacts_h8_rare_xgb_bagging_a100_v1/ensemble/blend_test.parquet`
+- `artifacts_h8_hard_xgb_bagging_a100_v1/ensemble/blend_oof.parquet`
+- `artifacts_h8_hard_xgb_bagging_a100_v1/ensemble/blend_test.parquet`
+
 ### Priority 1 — `H9_full_xgb` (full/near-full extra features)
 
 Config:
