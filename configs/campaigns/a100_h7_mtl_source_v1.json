@@ -1,0 +1,12 @@
+{
+  "name": "a100_h7_mtl_source_v1",
+  "description": "H7 MTL (PyTorch multilabel MLP) source campaign.",
+  "workdir": "../..",
+  "log_dir": "artifacts_campaigns/a100_h7_mtl_source_v1",
+  "env": {"OMP_NUM_THREADS": "8", "MKL_NUM_THREADS": "8", "NUMEXPR_NUM_THREADS": "8"},
+  "tasks": [
+    {"id": "h7_write_meta", "cmd": "./.venv/bin/python scripts/h7_mtl_source.py --config configs/h7/top1_a100_h7_mtl_source_v1.json write-meta"},
+    {"id": "h7_run_bases", "cmd": "./.venv/bin/python scripts/h7_mtl_source.py --config configs/h7/top1_a100_h7_mtl_source_v1.json run-bases"},
+    {"id": "h7_blend", "cmd": "./.venv/bin/python scripts/h7_mtl_source.py --config configs/h7/top1_a100_h7_mtl_source_v1.json blend --models mtl"}
+  ]
+}

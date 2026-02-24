@@ -1,0 +1,21 @@
+{
+  "seed": 42,
+  "output_dir": "artifacts_h5_smart_v2_source",
+  "data": {
+    "train_target": "Data/Main/train_target.parquet",
+    "sample_submit": "Data/Main/sample_submit.parquet"
+  },
+  "targets": {},
+  "h5_smart": {
+    "source_manifest": "configs/manifests/champion_current_best_sources.json",
+    "fold_ids_path": "artifacts_fast_base/meta/fold_ids.npy",
+    "top_k_neighbors": 6,
+    "add_pairwise_products": true,
+    "target_sources": ["H0_blend", "H3_blend", "H4_blend", "H4_xgb", "H5_stack", "H6_blend", "H8_rare_blend", "H8_hard_blend"],
+    "neighbor_sources": ["H4_xgb", "H5_stack", "H8_rare_blend", "H8_hard_blend"],
+    "min_self_sources": 2,
+    "C": 0.5,
+    "max_iter": 1200,
+    "class_weight": "balanced"
+  }
+}

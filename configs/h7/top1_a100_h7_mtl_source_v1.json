@@ -1,0 +1,53 @@
+{
+  "seed": 42,
+  "output_dir": "artifacts_h7_mtl_source_v1",
+  "data": {
+    "train_main": "Data/Train/train_main_features.parquet",
+    "train_extra": "Data/Train/train_extra_features.parquet",
+    "test_main": "Data/Test/test_main_features.parquet",
+    "test_extra": "Data/Test/test_extra_features.parquet",
+    "train_target": "Data/Main/train_target.parquet",
+    "sample_submit": "Data/Main/sample_submit.parquet"
+  },
+  "folds": {"n_splits": 3, "method": "multilabel"},
+  "features": {
+    "extra_selection": "variance",
+    "extra_top_k": 1000,
+    "variance_sample_rows": 150000,
+    "add_row_stats": true,
+    "add_svd": false,
+    "per_target_top_k": 0,
+    "reuse_per_target_feature_map": true,
+    "quantize_num_decimals": [0],
+    "quantize_num_prefixes": ["num_feature"],
+    "quantize_max_cols": 220,
+    "oof_global_target_encoding": true,
+    "oof_te_alpha": 20.0,
+    "oof_te_max_cat_cols": 80
+  },
+  "models": {
+    "catboost": {"enabled": false, "params": {"iterations": 1}},
+    "lightgbm": {"enabled": false, "params": {"n_estimators": 1}},
+    "xgboost": {"enabled": false, "params": {"n_estimators": 1}}
+  },
+  "h7_mtl": {
+    "seed": 42,
+    "device": "cuda_if_available",
+    "hidden_dims": [512, 256, 128],
+    "dropout": 0.3,
+    "lr": 0.001,
+    "weight_decay": 0.00001,
+    "epochs": 20,
+    "patience": 4,
+    "batch_size": 512,
+    "num_workers": 0,
+    "grad_clip": 1.0,
+    "use_pos_weight": true,
+    "pos_weight_clip": 50.0,
+    "imputer": "median",
+    "scaler_with_mean": false
+  },
+  "blend": {"use_rank": true, "weight_step": 0.05},
+  "stack": {"C": 0.5, "max_iter": 1200, "class_weight": "balanced", "cross_target_top_k": 0, "cross_target_models": ["mtl"]},
+  "tracking": {"experiment_log": "artifacts_h7_mtl_source_v1/scores/experiment_log.jsonl"}
+}

@@ -370,21 +370,29 @@ These are not “one true feature selection”, but separate source-generating b
 
 ### H_LAMA (LightAutoML source)
 
-- Status: `PLANNED`
+- Status: `INFRA_READY` (runner/campaign) / `PLANNED` (execution)
 - Goal:
   - Black-box orthogonal source for top-level ensemble
 - Important decision:
   - Use only as source, not replacement for current architecture
 - Note:
   - Mostly CPU/RAM-bound in practice; A100 availability helps Colab runtime access/stability, but GPU itself is not the key accelerator here
+- Current infra:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/lama_source.py`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/lama/top1_a100_hlama_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_lama_sources_v1.json`
 
 ### H7_mlp (PyTorch MLP source)
 
-- Status: `PLANNED`
+- Status: `INFRA_READY` (runner/campaign) / `PLANNED` (execution)
 - Goal:
   - Orthogonal neural source (embeddings + numeric path)
 - Priority:
   - Below `H9_full_xgb` and `H_LAMA`
+- Current infra:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/h7_mtl_source.py`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/h7/top1_a100_h7_mtl_source_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_h7_mtl_source_v1.json`
 
 ### Strong H6 on A100/strong CPU
 
@@ -403,6 +411,10 @@ These are not “one true feature selection”, but separate source-generating b
   - `scripts/hpo_xgb_targets.py`
   - `configs/hpo/xgb_targets_all41_v1.json`
   - `configs/campaigns/a100_hpo_xgb_targets_v1.json`
+  - `scripts/hpo_boosting_targets.py`
+  - `configs/hpo/cat_targets_all41_v1.json`
+  - `configs/hpo/lgb_targets_all41_v1.json`
+  - `configs/campaigns/a100_hpo_catlgb_targets_v1.json`
 - Decision:
   - Execute after/alongside `H9_full_xgb` when A100 window is stable enough for long campaigns
 
@@ -415,6 +427,10 @@ These are not “one true feature selection”, but separate source-generating b
   - `scripts/hpo_xgb_targets.py` (resumable search + export tuned config + source training)
   - `configs/hpo/xgb_targets_rarehard_v1.json`
   - `configs/campaigns/a100_hpo_xgb_targets_v1.json`
+  - `scripts/hpo_boosting_targets.py` (generic Cat/LGB/XGB HPO)
+  - `configs/hpo/cat_targets_rarehard_v1.json`
+  - `configs/hpo/lgb_targets_rarehard_v1.json`
+  - `configs/campaigns/a100_hpo_catlgb_targets_v1.json`
 - Decision:
   - First HPO execution target once A100 window is stable (after or alongside `H9_full_xgb`)
 
@@ -594,6 +610,14 @@ Recommended rule:
   - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/hpo/xgb_targets_all41_v1.json`
 - XGBoost HPO campaign spec:
   - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_hpo_xgb_targets_v1.json`
+- Generic boosting HPO framework (`catboost` / `lightgbm` / `xgboost`):
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/hpo_boosting_targets.py`
+- Cat/LGB HPO configs/campaign:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/hpo/cat_targets_rarehard_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/hpo/cat_targets_all41_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/hpo/lgb_targets_rarehard_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/hpo/lgb_targets_all41_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_hpo_catlgb_targets_v1.json`
 - Feature audit pipeline (OOF permutation + null):
   - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/feature_audit_oof.py`
 - Feature audit configs/campaign:
@@ -608,6 +632,22 @@ Recommended rule:
   - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_h8_xgb_bagging_v1.json`
 - A100 runbook:
   - `/Users/arceniy/Documents/Projects/Data ML Hack 2/docs/A100_READINESS_RUNBOOK.md`
+- Linear source runner/campaign:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/linear_source.py`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/linear/top1_a100_hlinear_sgd_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_linear_sources_v1.json`
+- LightAutoML source runner/campaign:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/lama_source.py`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/lama/top1_a100_hlama_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_lama_sources_v1.json`
+- H5 Smart source runner/campaign:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/h5_smart_source.py`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/h5/top1_h5_smart_v2_source.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_h5_smart_v2.json`
+- H7 MTL source runner/campaign:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/h7_mtl_source.py`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/h7/top1_a100_h7_mtl_source_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_h7_mtl_source_v1.json`
 
 ## N. Imported Ideas Backlog (from `/Users/arceniy/Downloads/ML_Гипотезы_План.md`)
 
@@ -615,22 +655,32 @@ These are explicitly captured so they do not get lost. Some overlap with existin
 
 ### H7_MTL (multi-task neural network, 41 heads)
 
-- Status: `PLANNED`
+- Status: `INFRA_READY`
 - Maps to:
   - `H7_mlp` / `H7_MTL` A100 branch
 - Rationale:
   - Potentially strong orthogonal source, especially for rare targets via shared representation
 - Current priority:
   - High potential, but below `H9_full_xgb` and `H8` specialist/HPO lines due to implementation/training complexity
+- Current infra:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/h7_mtl_source.py`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/h7/top1_a100_h7_mtl_source_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_h7_mtl_source_v1.json`
+- Note:
+  - Local smoke is CLI/compile-only unless `torch` is installed; runtime validation is expected on A100.
 
 ### H_Linear (GLM / ElasticNet source; H2O optional)
 
-- Status: `PLANNED`
+- Status: `INFRA_READY` (sklearn linear source) / `PLANNED` (H2O GLM variant)
 - Rationale:
   - Linear source may capture global trends trees approximate poorly
 - Clarification:
   - The idea is high-quality; H2O is one implementation option, not mandatory
   - A lightweight linear-source baseline can be tested before H2O
+- Current infra:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/linear_source.py`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/linear/top1_a100_hlinear_sgd_v1.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_linear_sources_v1.json`
 
 ### H8_Rare_Bagging (undersampling bagging for rare targets)
 
@@ -673,11 +723,15 @@ These are explicitly captured so they do not get lost. Some overlap with existin
 
 ### H5_Smart (cross-target interactions on OOF preds)
 
-- Status: `PLANNED`
+- Status: `INFRA_READY`
 - Rationale:
   - Can extend H5 using correlation-informed pairs and engineered interactions
 - Note:
   - Must use OOF predictions to avoid leakage
+- Current infra:
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/scripts/h5_smart_source.py`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/h5/top1_h5_smart_v2_source.json`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/configs/campaigns/a100_h5_smart_v2.json`
 
 ### Pseudo-Labeling (late-stage)
 

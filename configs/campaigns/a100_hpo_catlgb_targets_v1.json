@@ -1,0 +1,17 @@
+{
+  "name": "a100_hpo_catlgb_targets_v1",
+  "description": "Quality-first CatBoost/LightGBM target HPO campaign (rarehard + all41), resumable.",
+  "workdir": "../..",
+  "log_dir": "artifacts_campaigns/a100_hpo_catlgb_targets_v1",
+  "env": {"OMP_NUM_THREADS": "8", "MKL_NUM_THREADS": "8", "NUMEXPR_NUM_THREADS": "8"},
+  "tasks": [
+    {"id": "hpo_lgb_rarehard_search", "cmd": "./.venv/bin/python scripts/hpo_boosting_targets.py --config configs/hpo/lgb_targets_rarehard_v1.json search"},
+    {"id": "hpo_lgb_rarehard_train", "cmd": "./.venv/bin/python scripts/hpo_boosting_targets.py --config configs/hpo/lgb_targets_rarehard_v1.json train-source"},
+    {"id": "hpo_cat_rarehard_search", "cmd": "./.venv/bin/python scripts/hpo_boosting_targets.py --config configs/hpo/cat_targets_rarehard_v1.json search"},
+    {"id": "hpo_cat_rarehard_train", "cmd": "./.venv/bin/python scripts/hpo_boosting_targets.py --config configs/hpo/cat_targets_rarehard_v1.json train-source"},
+    {"id": "hpo_lgb_all41_search", "cmd": "./.venv/bin/python scripts/hpo_boosting_targets.py --config configs/hpo/lgb_targets_all41_v1.json search"},
+    {"id": "hpo_lgb_all41_train", "cmd": "./.venv/bin/python scripts/hpo_boosting_targets.py --config configs/hpo/lgb_targets_all41_v1.json train-source"},
+    {"id": "hpo_cat_all41_search", "cmd": "./.venv/bin/python scripts/hpo_boosting_targets.py --config configs/hpo/cat_targets_all41_v1.json search"},
+    {"id": "hpo_cat_all41_train", "cmd": "./.venv/bin/python scripts/hpo_boosting_targets.py --config configs/hpo/cat_targets_all41_v1.json train-source"}
+  ]
+}

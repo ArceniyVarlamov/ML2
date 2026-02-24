@@ -1,0 +1,17 @@
+{
+  "name": "a100_h5_smart_v2",
+  "description": "Safe OOF H5 smart meta-source (cross-target interactions) from champion sources.",
+  "workdir": "../..",
+  "log_dir": "artifacts_campaigns/a100_h5_smart_v2",
+  "tasks": [
+    {
+      "id": "h5_smart_run",
+      "cmd": "./.venv/bin/python scripts/h5_smart_source.py --config configs/h5/top1_h5_smart_v2_source.json run",
+      "done_if_all_exist": [
+        "artifacts_h5_smart_v2_source/base/h5smart_oof.parquet",
+        "artifacts_h5_smart_v2_source/ensemble/blend_oof.parquet",
+        "artifacts_h5_smart_v2_source/scores/blend_scores.json"
+      ]
+    }
+  ]
+}

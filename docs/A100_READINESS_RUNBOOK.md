@@ -91,6 +91,22 @@ Key outputs (rarehard pilot):
 - `artifacts_h8_hpo_xgb_rarehard_v1/base/xgboost_oof.parquet`
 - `artifacts_h8_hpo_xgb_rarehard_v1/ensemble/blend_oof.parquet`
 
+### CatBoost/LightGBM target-HPO campaign (quality-first, resumable)
+
+This extends the same target-HPO idea beyond XGBoost using a generic boosting HPO runner.
+
+```bash
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_hpo_catlgb_targets_v1.json
+```
+
+Useful staged runs:
+
+```bash
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_hpo_catlgb_targets_v1.json --only hpo_lgb_rarehard_search
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_hpo_catlgb_targets_v1.json --only hpo_cat_rarehard_search
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_hpo_catlgb_targets_v1.json --from-task hpo_lgb_all41_search
+```
+
 ### Feature-audit campaign (anti-noise layer, resumable)
 
 Run before aggressive feature pruning decisions and before building `FS_signal_only` / `FS_drift_pruned` from heuristics alone:
@@ -122,6 +138,54 @@ Key outputs:
 - `artifacts_h8_rare_xgb_bagging_a100_v1/ensemble/blend_test.parquet`
 - `artifacts_h8_hard_xgb_bagging_a100_v1/ensemble/blend_oof.parquet`
 - `artifacts_h8_hard_xgb_bagging_a100_v1/ensemble/blend_test.parquet`
+
+### Linear source campaign (orthogonal GLM-like source)
+
+```bash
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_linear_sources_v1.json
+```
+
+Key outputs:
+
+- `artifacts_hlinear_sgd_a100_v1/base/linear_oof.parquet`
+- `artifacts_hlinear_sgd_a100_v1/ensemble/blend_oof.parquet`
+
+### LightAutoML source campaign (black-box orthogonal source)
+
+Requires `lightautoml` installed in the A100 runtime.
+
+```bash
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_lama_sources_v1.json
+```
+
+Key outputs:
+
+- `artifacts_hlama_a100_v1/base/lama_oof.parquet`
+- `artifacts_hlama_a100_v1/ensemble/blend_oof.parquet`
+
+### H5 Smart v2 source campaign (safe OOF cross-target interactions)
+
+```bash
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_h5_smart_v2.json
+```
+
+Key outputs:
+
+- `artifacts_h5_smart_v2_source/base/h5smart_oof.parquet`
+- `artifacts_h5_smart_v2_source/ensemble/blend_oof.parquet`
+
+### H7 MTL source campaign (PyTorch multilabel source)
+
+Requires `torch` installed in the A100 runtime.
+
+```bash
+./.venv/bin/python scripts/a100_campaign.py --campaign configs/campaigns/a100_h7_mtl_source_v1.json
+```
+
+Key outputs:
+
+- `artifacts_h7_mtl_source_v1/base/mtl_oof.parquet`
+- `artifacts_h7_mtl_source_v1/ensemble/blend_oof.parquet`
 
 ### Priority 1 — `H9_full_xgb` (full/near-full extra features)
 
