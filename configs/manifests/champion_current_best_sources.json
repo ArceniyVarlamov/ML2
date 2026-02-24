@@ -1,0 +1,44 @@
+{
+  "sources": [
+    {
+      "label": "H0_blend",
+      "oof_path": "artifacts_fast_base/ensemble/blend_oof.parquet",
+      "test_path": "artifacts_fast_base/ensemble/blend_test.parquet"
+    },
+    {
+      "label": "H3_blend",
+      "oof_path": "artifacts_fast_h3_quantize_te/ensemble/blend_oof.parquet",
+      "test_path": "artifacts_fast_h3_quantize_te/ensemble/blend_test.parquet"
+    },
+    {
+      "label": "H4_blend",
+      "oof_path": "artifacts_fast_h4_xgb_gpu4050/ensemble/blend_oof.parquet",
+      "test_path": "artifacts_fast_h4_xgb_gpu4050/ensemble/blend_test.parquet"
+    },
+    {
+      "label": "H4_xgb",
+      "oof_path": "artifacts_fast_h4_xgb_gpu4050/base/xgboost_oof.parquet",
+      "test_path": "artifacts_fast_h4_xgb_gpu4050/base/xgboost_test.parquet"
+    },
+    {
+      "label": "H5_stack",
+      "oof_path": "artifacts_fast_h5_crossstack/ensemble/stack_oof.parquet",
+      "test_path": "artifacts_fast_h5_crossstack/ensemble/stack_test.parquet"
+    },
+    {
+      "label": "H6_blend",
+      "oof_path": "artifacts_fast_h6_targetaware_ultrasafe/ensemble/blend_oof.parquet",
+      "test_path": "artifacts_fast_h6_targetaware_ultrasafe/ensemble/blend_test.parquet"
+    },
+    {
+      "label": "H8_rare_blend",
+      "oof_path": "artifacts_h8_rare_h4gpu4050_v1/ensemble/blend_oof.parquet",
+      "test_path": "artifacts_h8_rare_h4gpu4050_v1/ensemble/blend_test.parquet"
+    },
+    {
+      "label": "H8_hard_blend",
+      "oof_path": "artifacts_h8_hard_h4gpu4050_v1/ensemble/blend_oof.parquet",
+      "test_path": "artifacts_h8_hard_h4gpu4050_v1/ensemble/blend_test.parquet"
+    }
+  ]
+}

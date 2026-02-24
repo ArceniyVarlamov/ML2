@@ -1,6 +1,6 @@
 # Hypotheses & Strategy Registry (Living Document)
 
-Last updated: `2026-02-23` (manual sync from experiment history and current repo state)
+Last updated: `2026-02-23` (manual sync from experiment history, repo state, and imported idea list)
 
 ## Purpose
 
@@ -16,9 +16,9 @@ Rule: **do not delete old ideas**. Change status + add evidence instead.
 
 ## Current State (Ground Truth)
 
-- Current best reported Public LB: **`0.83960751`**
+- Current best reported Public LB: **`0.840359537417668`**
 - Current champion submission:
-  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/artifacts_cross_hyp/submissions/sub_H0_H3_H4_H4xgb_H5_H6_top2w.parquet`
+  - `/Users/arceniy/Documents/Projects/Data ML Hack 2/artifacts_cross_hyp/submissions/sub_CHAMP_plus_H8rare_blend_H8hard_blend_top2w.parquet`
 - Current top-1 leaderboard score (reported): **`0.8520496542`**
 - Gap to top-1: **~`0.01244`**
 
@@ -30,6 +30,8 @@ Rule: **do not delete old ideas**. Change status + add evidence instead.
 - `H4_xgb` (top-level source, separate from H4_blend)
 - `H5_stack`
 - `H6_blend`
+- `H8_rare_blend` (partial source; rare targets only)
+- `H8_hard_blend` (partial source; hard targets only)
 - Top-level ensemble mode: `top2_weighted`
 
 ## Status Legend
@@ -39,6 +41,7 @@ Rule: **do not delete old ideas**. Change status + add evidence instead.
 - `NEUTRAL`: no clear signal yet
 - `NEG_IN_CORE`: tested in strong core and currently degrades score
 - `INFRA_READY`: code support implemented, experiment not yet run
+- `RUNNING`: experiment currently running / awaiting results
 - `PLANNED`: idea captured, not implemented yet
 - `FROZEN`: deprioritized for now (can be revisited later)
 
@@ -210,15 +213,29 @@ Rule: **do not delete old ideas**. Change status + add evidence instead.
 
 ### H4 source decompression: `H4_cat`, `H4_lgb` (planned next)
 
-- Status: `INFRA_READY`
+- Status: `FROZEN` (for current `top2w` H4-heavy core)
 - Idea:
   - Add `H4_cat` and `H4_lgb` as extra top-level sources, not only `H4_blend`
 - Why:
   - Same logic as `H4_xgb` success: uncompress signal for per-target top-level selection
 - Current evidence:
-  - `H4_xgb` already validated the pattern
+  - `H4_xgb` validated the pattern
+  - `H4_cat`, `H4_lgb`, `H4_cat+H4_lgb` produced exact duplicate outputs vs existing non-H4xgb champion core
+  - `H4_cat+H4_lgb+H4_xgb` produced exact duplicate of current champion (`H4_xgb` already captures the useful extra signal)
 - Decision:
-  - High priority next source-expansion line
+  - Closed for now in current `top2w` core
+  - Revisit only if top-level ensemble mode changes (e.g., `top3_weighted`, correlation-aware selection) or source library changes substantially
+
+### H3 source decompression: `H3_cat`, `H3_lgb`
+
+- Status: `FROZEN` (for current `top2w` H4-heavy core)
+- Idea:
+  - Add H3 base-model sources separately (`H3_cat`, `H3_lgb`) on top of `H3_blend`
+- Evidence:
+  - `H3_cat`, `H3_lgb`, `H3_cat+H3_lgb` produced exact duplicates of the current champion in tested `top2w` H4-heavy core
+- Decision:
+  - Closed for now in current top-level mode/core
+  - Revisit only if top-level selection policy changes
 
 ## D. Feature-Set Program (Beyond H0–H6)
 
@@ -288,7 +305,7 @@ These are not “one true feature selection”, but separate source-generating b
 
 ### H8_rare (rare-target specialists)
 
-- Status: `INFRA_READY` (pipeline support added; configs/training not yet done)
+- Status: `PROVEN+` (as partial source)
 - Goal:
   - Improve rare targets that disproportionately hurt Macro AUC
 - Infra now available:
@@ -297,15 +314,17 @@ These are not “one true feature selection”, but separate source-generating b
   - group-specific parameter overrides
   - fallback submit for partial target outputs
 - Decision:
-  - High priority next “new training” branch
+  - Keep as partial source (`H8_rare_blend`) for champion builds
+  - `H8_rare_stack` currently redundant/duplicate in tested top-level setup
 
 ### H8_hard (low-AUC target specialists)
 
-- Status: `INFRA_READY`
+- Status: `PROVEN+` (as partial source)
 - Goal:
   - Improve hardest targets by current OOF/LB metrics
 - Decision:
-  - High priority next “new training” branch (parallel to H8_rare)
+  - Keep as partial source (`H8_hard_blend`) for champion builds
+  - `H8_hard_stack` lower priority than blend
 
 ### H8_common (common targets baseline or separate tuning)
 
@@ -330,6 +349,8 @@ These are not “one true feature selection”, but separate source-generating b
   - Black-box orthogonal source for top-level ensemble
 - Important decision:
   - Use only as source, not replacement for current architecture
+- Note:
+  - Mostly CPU/RAM-bound in practice; A100 availability helps Colab runtime access/stability, but GPU itself is not the key accelerator here
 
 ### H7_mlp (PyTorch MLP source)
 
@@ -399,6 +420,7 @@ These are not “one true feature selection”, but separate source-generating b
 3. `H1` and `H2` reinserted into current best H4-core did not improve current best LB.
 4. `H6` as solo source is weak (keep only as top-level micro-source).
 5. `sub_H0_H2_H3_H4_H5_H6_top2w.parquet` is a duplicate of `sub_H0_H2_H3_H4_H5_top2w.parquet` (same content).
+6. `H8_rare_stack` was a duplicate of the pre-H8 champion in the tested top-level setup.
 
 ## J. Public LB History (Key Anchor Points)
 
@@ -427,26 +449,81 @@ These are reported results used in decision-making. Keep appending here.
 - `sub_H0_H3_H4_H4xgb_H5_H6_top2w.parquet` -> **`0.83960751`** (current best)
 - `sub_H0_H1_H3_H4_H4xgb_H5_H6_top2w.parquet` -> `0.8395941994`
 
+### H8 specialists integrated as partial top-level sources
+
+- `sub_CHAMP_plus_H8hard_blend_top2w.parquet` -> `0.839838349`
+- `sub_CHAMP_plus_H8rare_blend_top2w.parquet` -> `0.8401286984`
+- `sub_CHAMP_plus_H8rare_blend_H8hard_blend_top2w.parquet` -> **`0.840359537417668`** (new current best)
+
+Notes:
+
+- `H8_rare` and `H8_hard` provide additive gains in the current top-level setup (disjoint target groups, partial-source routing works as intended)
+
 ## K. Current Priority Ranking (Living, Strategy-Level)
 
 ### Tier 1 — Highest ROI right now
 
-1. **Top-level source expansion around H4**
-   - `H4_cat`, `H4_lgb`, combinations with `H4_xgb`
-2. **H8 specialists (`rare`, `hard`)**
-3. **FS_pcat** and **FS_drift_pruned** as new sources
+1. **H8 specialists v2** (`rare/hard` upgrades: HPO-lite, bagging on rare, source decompression)
+2. **`top3_weighted` top-level ensemble mode (fixed weights, no SLSQP)**
+3. **H_DART sources (`H4_dart_*`, later `H8_dart_*` if useful)**
+4. **FS_pcat** as new source
+5. **FS_drift_pruned** as source (only if advval signals drift; currently lower than FS_pcat)
 
 ### Tier 2 — Strong next wave (especially once A100 arrives)
 
 1. `H9_full_xgb`
-2. `H_LAMA`
-3. Stronger `H6` (non-ultrasafe)
-4. `H7_mlp`
+2. `H8` specialists + narrow HPO (`rare/hard`, `xgboost` first)
+3. `H_LAMA` / linear-source family (GLM baseline first, H2O GLM optional heavier implementation)
+4. Stronger `H6` (non-ultrasafe)
+5. `H7_mlp` / `H7_MTL`
 
 ### Tier 3 — Narrow tuning / refinement
 
-1. Specialist-only HPO (`rare/hard`)
+1. `H5_Smart` (cross-target engineered interactions on OOF preds)
 2. `optimize_weights` revisit (only after source library grows significantly)
+3. `Pseudo-labeling` (final-stage only)
+
+## K2. Why This Priority Ranking Looks Like This (Decision Rule)
+
+To avoid confusion from “too many ideas”, every idea is ranked by four factors:
+
+1. **Expected upside** (can it plausibly move LB by `+0.000x` to `+0.00x`?)
+2. **Time-to-signal** (how fast we can get a trustworthy OOF/LB answer)
+3. **Integration friction** (how hard to produce clean OOF/test sources for top-level ensemble)
+4. **Risk of false progress** (OOF-overfit, duplicates, unstable training, operational overhead)
+
+In practice, we prioritize ideas that produce **new orthogonal sources quickly** and plug directly into the current winning architecture.
+
+Examples:
+
+- `H4_xgb` source expansion ranked high and paid off immediately (`PROVEN+`)
+- `H4_cat/H4_lgb` and `H3_cat/H3_lgb` were cheap to test and are now closed (duplicates)
+- `optimize_weights` is implemented but de-prioritized because Public LB already showed underperformance vs `top2_weighted`
+- `H8` specialists are high priority because Macro AUC heavily weights weak targets
+
+### Clarification on “Why are we cautious about H2O / heavy ideas?”
+
+The caution is **not** “H2O is bad” and **not** “it cannot finish in a day on Colab”.
+
+What the caution actually means:
+
+1. **A100 GPU does not directly accelerate H2O GLM much**
+   - GLM/ElasticNet workloads are primarily CPU/RAM-bound, not GPU-bound
+2. **Runtime cost is not only training**
+   - OOF extraction, 41-target orchestration, format normalization, and integration into top-level ensemble also cost time
+3. **We compare ideas by ROI in the current architecture**
+   - A no-train change like `top3_weighted` or a DART source may give signal faster than wiring up H2O
+
+Decision implication:
+
+- `H2O GLM` (or any linear-source family) is **not rejected**
+- It is a **valid planned source**, but usually after:
+  - `H8 baseline specialists`
+  - `H_DART`
+  - `top3_weighted`
+  - `H9_full_xgb`
+
+If strong compute/RAM and engineering bandwidth are available, H2O/GLM can absolutely be promoted earlier.
 
 ## L. Maintenance Protocol (How We Keep This File Alive)
 
@@ -474,3 +551,75 @@ Recommended rule:
 - Target group generator for H8:
   - `/Users/arceniy/Documents/Projects/Data ML Hack 2/build_target_groups.py`
 
+## N. Imported Ideas Backlog (from `/Users/arceniy/Downloads/ML_Гипотезы_План.md`)
+
+These are explicitly captured so they do not get lost. Some overlap with existing registry items.
+
+### H7_MTL (multi-task neural network, 41 heads)
+
+- Status: `PLANNED`
+- Maps to:
+  - `H7_mlp` / `H7_MTL` A100 branch
+- Rationale:
+  - Potentially strong orthogonal source, especially for rare targets via shared representation
+- Current priority:
+  - High potential, but below `H9_full_xgb` and `H8` specialist/HPO lines due to implementation/training complexity
+
+### H_Linear (GLM / ElasticNet source; H2O optional)
+
+- Status: `PLANNED`
+- Rationale:
+  - Linear source may capture global trends trees approximate poorly
+- Clarification:
+  - The idea is high-quality; H2O is one implementation option, not mandatory
+  - A lightweight linear-source baseline can be tested before H2O
+
+### H8_Rare_Bagging (undersampling bagging for rare targets)
+
+- Status: `PLANNED`
+- Maps to:
+  - `H8` family v2 (after baseline `H8_rare`/`H8_hard`)
+- Rationale:
+  - Strong macro-AUC-specific idea; likely useful where class weighting alone is insufficient
+- Risk:
+  - Higher training cost and orchestration complexity (many models per target)
+
+### H_DART (LGBM/XGB DART sources)
+
+- Status: `PLANNED`
+- Rationale:
+  - Likely lower solo score but potentially strong diversity source for top-level ensemble
+- Current priority:
+  - High (cheap new source family, directly compatible with current architecture)
+
+### H4_Unpack (expose strong solo sources instead of only H4_blend)
+
+- Status: `PROVEN+`
+- Evidence:
+  - `H4_xgb` as top-level source is already part of current champion
+- Notes:
+  - `H4_cat/H4_lgb` tested and currently redundant in the tested `top2w` core
+
+### Top-3 Weighted (fixed-weight top-3 per target)
+
+- Status: `PLANNED`
+- Rationale:
+  - Middle ground between robust `top2_weighted` and overfitting-prone `optimize_weights`
+- Current priority:
+  - High no-train experiment candidate
+
+### H5_Smart (cross-target interactions on OOF preds)
+
+- Status: `PLANNED`
+- Rationale:
+  - Can extend H5 using correlation-informed pairs and engineered interactions
+- Note:
+  - Must use OOF predictions to avoid leakage
+
+### Pseudo-Labeling (late-stage)
+
+- Status: `PLANNED`
+- Rationale:
+  - Potential late boost after strong champion is established
+- Current priority:
+  - Final-stage only (higher risk, lower interpretability)
